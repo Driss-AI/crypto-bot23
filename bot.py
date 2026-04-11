@@ -6,6 +6,7 @@ import pandas_ta as ta
 from dotenv import load_dotenv
 from risk_manager import RiskManager
 from news_fetcher import get_latest_news
+from performance import record_trade, update_trade, get_performance_report
 import os
 import time
 import requests
@@ -13,13 +14,14 @@ import requests
 # ── SETUP ────────────────────────────────────────────────
 load_dotenv()
 api_key          = os.getenv("ANTHROPIC_API_KEY") or "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"
-TELEGRAM_TOKEN   = "8707992591:AAEqkOc0pmK1rAEYVnMnh8DdK7KmaLGLiSA"
-TELEGRAM_CHAT_ID = "6463217777"
+TELEGRAM_TOKEN   = os.getenv("TELEGRAM_TOKEN") or "8707992591:AAEqkOc0pmK1rAEYVnMnh8DdK7KmaLGLiSA"
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or "6463217777"
 
 client   = anthropic.Anthropic(api_key=api_key)
 exchange = ccxt.binance()
 rm       = RiskManager(total_capital=1000)
 LOG_FILE = "bot_log.txt"
+open_trade_id = None
 
 # ── TELEGRAM ─────────────────────────────────────────────
 def send_telegram(message):
@@ -74,8 +76,6 @@ def get_market_data():
 # ── STEP 2: ASK CLAUDE ───────────────────────────────────
 def ask_claude(data):
     log("🧠 Asking Claude AI for analysis...")
-
-    # Get latest news + Fear & Greed
     news = get_latest_news()
 
     prompt = f"""
@@ -127,7 +127,18 @@ Be decisive. Give a clear action.
 
 # ── STEP 3: PAPER TRADE + TELEGRAM ───────────────────────
 def paper_trade(action, confidence, reasoning, risks, data):
+    global open_trade_id
     price = data["price"]
+
+    # Check if open trade hit stop loss or take profit
+    if open_trade_id:
+        hit = update_trade(open_trade_id, price)
+        if hit:
+            log(f"🏁 Trade #{open_trade_id} closed!")
+            open_trade_id = None
+            # Send performance update
+            send_telegram(get_performance_report())
+
     approved, reason, details = rm.check_trade(action, price, confidence)
 
     action_emoji = "🟢" if action == "BUY" else "🔴" if action == "SELL" else "🟡"
@@ -145,14 +156,30 @@ def paper_trade(action, confidence, reasoning, risks, data):
 🧠 {reasoning}
 ⚠️ {risks}"""
 
-    if approved:
+    if approved and not open_trade_id:
+        open_trade_id = record_trade(
+            action,
+            price,
+            details['stop_loss'],
+            details['take_profit'],
+            details['position_size_usd'],
+            confidence
+        )
         msg += f"""
 
-✅ <b>PAPER TRADE:</b>
+✅ <b>PAPER TRADE #{open_trade_id}:</b>
 - Size: ${details['position_size_usd']}
+- Entry: ${price:,.2f}
 - Stop loss: ${details['stop_loss']:,}
-- Take profit: ${details['take_profit']:,}"""
-        log(f"📝 Paper trade: {action} @ ${price:,}")
+- Take profit: ${details['take_profit']:,}
+- Max loss: ${details['max_loss_usd']}
+- Max gain: ${details['max_gain_usd']}"""
+        log(f"📝 Trade #{open_trade_id} opened: {action} @ ${price:,}")
+
+    elif open_trade_id:
+        msg += f"\n\n⏸️ Trade #{open_trade_id} still open — waiting for exit"
+        log(f"⏳ Holding open trade #{open_trade_id}")
+
     else:
         msg += f"\n\n⏸️ No trade — {reason}"
         log(f"⏸️ No trade: {reason}")
@@ -165,19 +192,26 @@ def run_bot():
     log("🚀 CRYPTO BOT STARTING — PAPER TRADING MODE")
     log("="*50)
 
-    send_telegram("🚀 <b>Crypto Bot Started!</b>\n\n📊 Watching BTC/USDT 24/7\n⏰ Analysis every hour\n🛡️ Risk management active\n📰 News sentiment enabled!")
+    send_telegram("🚀 <b>Crypto Bot Started!</b>\n\n📊 Watching BTC/USDT 24/7\n⏰ Analysis every hour\n🛡️ Risk management active\n📰 News sentiment enabled!\n📊 Performance tracking active!")
 
+    cycle = 0
     while True:
         try:
             log("\n" + "-"*50)
             log("🔄 New analysis cycle starting...")
+            cycle += 1
 
             data = get_market_data()
             log(f"💰 BTC: ${data['price']:,.2f} | RSI: {data['rsi']:.1f}")
 
             action, confidence, reasoning, risks = ask_claude(data)
-
             paper_trade(action, confidence, reasoning, risks, data)
+
+            # Send performance report every 24 cycles (24 hours)
+            if cycle % 24 == 0:
+                report = get_performance_report()
+                send_telegram(f"📊 <b>Daily Performance Report</b>\n{report}")
+                log("📊 Daily report sent!")
 
             log("⏰ Next analysis in 1 hour...")
             time.sleep(3600)
