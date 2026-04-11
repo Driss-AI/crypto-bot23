@@ -1,0 +1,136 @@
+[2026-04-09 21:40:24] ==================================================
+[2026-04-09 21:40:24] 🚀 CRYPTO BOT STARTING — PAPER TRADING MODE
+[2026-04-09 21:40:24] ==================================================
+[2026-04-09 21:40:24] 
+--------------------------------------------------
+[2026-04-09 21:40:24] 🔄 New analysis cycle starting...
+[2026-04-09 21:40:24] 📡 Fetching market data from Binance...
+[2026-04-09 21:40:27] 💰 BTC Price: $72,478.01 | RSI: 65.6 | MACD: Bullish
+[2026-04-09 21:40:27] 🧠 Asking Claude AI for analysis...
+[2026-04-09 21:40:32] 🤖 Claude says:
+ACTION: HOLD
+CONFIDENCE: medium
+REASONING: MACD is bullish with strong momentum and volume confirms genuine buying interest at 1.68x average. However, price is trading above the upper Bollinger Band ($70,304), indicating an overextended/overbought condition that increases the probability of a short-term pullback or consolidation before further upside.
+RISKS: Mean reversion back toward the mid-Bollinger Band (~$72,179) could trigger a sharp intraday correction; elevated volume above the upper band could also signal a blow-off top if momentum fades quickly.
+[2026-04-09 21:40:32] 🛡️  Risk check: ⏸️  SKIPPED: Claude says wait. No trade placed.
+[2026-04-09 21:40:32] ⏸️  No trade placed.
+[2026-04-09 21:40:32] 
+⏰ Next analysis in 1 hour. Bot is watching the market...
+[2026-04-09 21:40:32] ==================================================
+[2026-04-09 22:32:27] ==================================================
+[2026-04-09 22:32:27] 🚀 CRYPTO BOT STARTING — PAPER TRADING MODE
+[2026-04-09 22:32:27] ==================================================
+[2026-04-09 22:32:27] 
+--------------------------------------------------
+[2026-04-09 22:32:27] 🔄 New analysis cycle starting...
+[2026-04-09 22:32:27] 📡 Fetching market data from Binance...
+[2026-04-09 22:32:29] 💰 BTC Price: $71,902.30 | RSI: 57.4 | MACD: Bullish
+[2026-04-09 22:32:29] 🧠 Asking Claude AI for analysis...
+[2026-04-09 22:32:29] ⚠️ Error occurred: "Could not resolve authentication method. Expected either api_key or auth_token to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted"
+[2026-04-09 22:32:29] Retrying in 60 seconds...
+[2026-04-09 22:33:47] ==================================================
+[2026-04-09 22:33:47] 🚀 CRYPTO BOT STARTING — PAPER TRADING MODE
+[2026-04-09 22:33:47] ==================================================
+[2026-04-09 22:33:47] 
+--------------------------------------------------
+[2026-04-09 22:33:47] 🔄 New analysis cycle starting...
+[2026-04-09 22:33:47] 📡 Fetching market data from Binance...
+[2026-04-09 22:33:49] 💰 BTC Price: $71,769.51 | RSI: 55.5 | MACD: Bullish
+[2026-04-09 22:33:49] 🧠 Asking Claude AI for analysis...
+[2026-04-09 22:33:49] ⚠️ Error occurred: "Could not resolve authentication method. Expected either api_key or auth_token to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted"
+[2026-04-09 22:33:49] Retrying in 60 seconds...
+[2026-04-09 22:34:49] 
+--------------------------------------------------
+[2026-04-09 22:34:49] 🔄 New analysis cycle starting...
+[2026-04-09 22:34:49] 📡 Fetching market data from Binance...
+[2026-04-09 22:34:50] 💰 BTC Price: $71,855.02 | RSI: 56.7 | MACD: Bullish
+[2026-04-09 22:34:50] 🧠 Asking Claude AI for analysis...
+[2026-04-09 22:34:50] ⚠️ Error occurred: "Could not resolve authentication method. Expected either api_key or auth_token to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted"
+[2026-04-09 22:34:50] Retrying in 60 seconds...
+[2026-04-09 22:38:33] ==================================================
+[2026-04-09 22:38:33] 🚀 CRYPTO BOT STARTING — PAPER TRADING MODE
+[2026-04-09 22:38:33] ==================================================
+[2026-04-09 22:38:33] 
+--------------------------------------------------
+[2026-04-09 22:38:33] 🔄 New analysis cycle starting...
+[2026-04-09 22:38:33] 📡 Fetching market data from Binance...
+[2026-04-09 22:38:35] 💰 BTC Price: $71,896.02 | RSI: 57.3 | MACD: Bullish
+[2026-04-09 22:38:35] 🧠 Asking Claude AI for analysis...
+[2026-04-09 22:38:40] 🤖 Claude says:
+ACTION: HOLD
+CONFIDENCE: medium
+REASONING: MACD is bullish with a strong positive crossover (243.97 vs 94.24 signal), but price is trading above the upper Bollinger Band indicating an overextended/stretched condition that typically precedes a pullback. Low volume (440 vs 727 avg) suggests this push lacks conviction and is unlikely to sustain further upside without stronger participation.
+RISKS: 1) Mean reversion toward the mid-Bollinger ($72,221) could trigger a short-term pullback. 2) Low volume breakouts above Bollinger bands are prone to false breakouts and sharp reversals.
+[2026-04-09 22:38:40] 🛡️  Risk check: ⏸️  SKIPPED: Claude says wait. No trade placed.
+[2026-04-09 22:38:40] ⏸️  No trade placed.
+[2026-04-09 22:38:40] 
+⏰ Next analysis in 1 hour. Bot is watching the market...
+[2026-04-09 22:38:40] ==================================================
+[2026-04-10 09:05:34] 
+--------------------------------------------------
+[2026-04-10 09:05:34] 🔄 New analysis cycle starting...
+[2026-04-10 09:05:34] 📡 Fetching market data from Binance...
+[2026-04-10 09:05:35] 💰 BTC Price: $72,153.80 | RSI: 56.9 | MACD: Bullish
+[2026-04-10 09:05:35] 🧠 Asking Claude AI for analysis...
+[2026-04-10 09:05:41] 🤖 Claude says:
+ACTION: HOLD
+CONFIDENCE: medium
+REASONING: MACD crossover is bullish with a strong positive histogram, but price is trading above the upper Bollinger Band, signaling an overextended move that often precedes a pullback. Critically, volume is extremely low (~4% of average), which means this breakout lacks conviction and is unreliable for initiating new positions.
+RISKS: Low volume breakout above Bollinger Band frequently results in a mean reversion back toward the mid-band (~$72,760); a sudden volume spike could trigger a sharp move in either direction, amplifying volatility.
+[2026-04-10 09:05:41] 🛡️  Risk check: ⏸️  SKIPPED: Claude says wait. No trade placed.
+[2026-04-10 09:05:41] ⏸️  No trade placed.
+[2026-04-10 09:05:41] 
+⏰ Next analysis in 1 hour. Bot is watching the market...
+[2026-04-10 09:05:41] ==================================================
+[2026-04-10 10:05:41] 
+--------------------------------------------------
+[2026-04-10 10:05:41] 🔄 New analysis cycle starting...
+[2026-04-10 10:05:41] 📡 Fetching market data from Binance...
+[2026-04-10 10:05:42] 💰 BTC Price: $72,159.69 | RSI: 57.0 | MACD: Bullish
+[2026-04-10 10:05:42] 🧠 Asking Claude AI for analysis...
+[2026-04-10 10:05:48] 🤖 Claude says:
+ACTION: HOLD
+CONFIDENCE: medium
+REASONING: MACD crossover is bullish with a strong positive histogram, but price is trading above the upper Bollinger Band indicating an overextended move. Critically, volume is extremely low (56 vs avg 789 — just 7% of average), suggesting this push lacks conviction and is vulnerable to a sharp reversal.
+RISKS: Low volume breakout could be a false signal leading to a mean reversion back toward the mid-band (~$72,771). A failed breakout above the upper band could trigger a swift pullback if sellers step in.
+[2026-04-10 10:05:48] 🛡️  Risk check: ⏸️  SKIPPED: Claude says wait. No trade placed.
+[2026-04-10 10:05:48] ⏸️  No trade placed.
+[2026-04-10 10:05:48] 
+⏰ Next analysis in 1 hour. Bot is watching the market...
+[2026-04-10 10:05:48] ==================================================
+[2026-04-10 13:47:13] ==================================================
+[2026-04-10 13:47:13] 🚀 CRYPTO BOT STARTING — PAPER TRADING MODE
+[2026-04-10 13:47:13] ==================================================
+[2026-04-10 13:47:14] 
+--------------------------------------------------
+[2026-04-10 13:47:14] 🔄 New analysis cycle starting...
+[2026-04-10 13:47:14] 📡 Fetching market data from Binance...
+[2026-04-10 13:47:17] 💰 BTC: $71,748.38 | RSI: 50.5
+[2026-04-10 13:47:17] 🧠 Asking Claude AI for analysis...
+[2026-04-10 13:47:22] 🤖 Claude: HOLD (medium)
+[2026-04-10 13:47:22] ⏸️ No trade: ⏸️  SKIPPED: Claude says wait. No trade placed.
+[2026-04-10 13:47:22] ⏰ Next analysis in 1 hour...
+[2026-04-10 13:48:46] ==================================================
+[2026-04-10 13:48:46] 🚀 CRYPTO BOT STARTING — PAPER TRADING MODE
+[2026-04-10 13:48:46] ==================================================
+[2026-04-10 13:48:47] 
+--------------------------------------------------
+[2026-04-10 13:48:47] 🔄 New analysis cycle starting...
+[2026-04-10 13:48:47] 📡 Fetching market data from Binance...
+[2026-04-10 13:48:51] 💰 BTC: $71,768.94 | RSI: 50.8
+[2026-04-10 13:48:51] 🧠 Asking Claude AI for analysis...
+[2026-04-10 13:48:57] 🤖 Claude: HOLD (medium)
+[2026-04-10 13:48:57] ⏸️ No trade: ⏸️  SKIPPED: Claude says wait. No trade placed.
+[2026-04-10 13:48:57] ⏰ Next analysis in 1 hour...
+[2026-04-10 16:21:05] ==================================================
+[2026-04-10 16:21:05] 🚀 CRYPTO BOT STARTING — PAPER TRADING MODE
+[2026-04-10 16:21:05] ==================================================
+[2026-04-10 16:21:05] 
+--------------------------------------------------
+[2026-04-10 16:21:05] 🔄 New analysis cycle starting...
+[2026-04-10 16:21:05] 📡 Fetching market data from Binance...
+[2026-04-10 16:21:14] 💰 BTC: $72,226.61 | RSI: 57.8
+[2026-04-10 16:21:14] 🧠 Asking Claude AI for analysis...
+[2026-04-10 16:21:22] 🤖 Claude: HOLD (medium)
+[2026-04-10 16:21:22] ⏸️ No trade: ⏸️  SKIPPED: Claude says wait. No trade placed.
+[2026-04-10 16:21:23] ⏰ Next analysis in 1 hour...
