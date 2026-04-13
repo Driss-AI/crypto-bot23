@@ -6,3 +6,4 @@ requests
 python-dotenv
 feedparser
 psycopg2-binary
+flask
