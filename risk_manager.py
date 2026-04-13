@@ -49,7 +49,7 @@ class RiskManager:
         position_size = self.total_capital * self.max_risk_per_trade * risk_multiplier
 
         # ── RULE 5: Minimum trade size ───────────────────
-        if position_size < 10:
+        if position_size < 1:
             return False, "❌ BLOCKED: Position size too small to be worth trading.", 0
 
         # ── ALL CHECKS PASSED ────────────────────────────
