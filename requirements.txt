@@ -4,4 +4,5 @@ pandas
 pandas-ta
 requests
 python-dotenv
-feedparserpsycopg2-binary
+feedparser
+psycopg2-binary
