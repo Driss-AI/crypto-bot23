@@ -23,7 +23,7 @@ else:
     USE_PG = False
 
 app = Flask(__name__)
-exchange = ccxt.binance()
+exchange = ccxt.binance({"apiKey": os.getenv("BINANCE_API_KEY"), "secret": os.getenv("BINANCE_SECRET")})
 
 COINS = ["BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT"]
 
