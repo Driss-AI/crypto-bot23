@@ -21,7 +21,8 @@ from scalper_agent   import ScalperAgent
 from technical_agent import TechnicalAgent   # day trade agent
 from swing_agent     import SwingAgent
 from macro_agent     import MacroAgent
-from news_fetcher    import get_latest_news
+from news_scraper    import get_full_sentiment, format_for_ai
+from whale_detector  import analyze_whales, format_whale_summary
 from risk_manager    import RiskManager
 from performance     import record_trade, update_trade, get_performance_report
 from agent_memory    import AgentMemory
@@ -108,7 +109,7 @@ def send_telegram(msg):
 
 # ── CLAUDE DECISION ───────────────────────────────────────
 
-def ask_claude(symbol, style, agent_result, macro, news) -> dict:
+def ask_claude(symbol, style, agent_result, macro, news, whale_data=None) -> dict:
     coin   = symbol.replace("/USDT", "")
     data   = agent_result.get("raw_data", {})
     signal = agent_result.get("signal", "HOLD")
@@ -124,6 +125,9 @@ def ask_claude(symbol, style, agent_result, macro, news) -> dict:
             f"Regime: {macro.get('regime','?')} | Score: {macro.get('score',0):+d}\n"
             f"Fear & Greed: {fg.get('value','?')}/100 ({fg.get('label','?')})"
         )
+
+    whale = (whale_data or {}).get(symbol, {})
+    whale_text = format_whale_summary(whale) if whale else 'No whale data'
 
     prompt = f"""You are a crypto trading AI specializing in {style_name} trading.
 
@@ -142,6 +146,8 @@ Why: {agent_result.get('reasoning', '')}
 
 📰 SENTIMENT (summary):
 {news[:400]}
+
+{whale_text}
 
 Make the FINAL {style_name} decision. Respond EXACTLY:
 ACTION: [BUY or SELL or HOLD]
@@ -254,7 +260,7 @@ def execute(style, symbol, agent_result, final, macro):
 
 # ── STYLE RUNNERS ─────────────────────────────────────────
 
-def run_style(style, agent_fn, news):
+def run_style(style, agent_fn, news, whale_data=None):
     """Run one style across all coins."""
     global shared_macro
     style_emoji = {"scalp": "🔥", "day": "📈", "swing": "🌊"}[style]
@@ -317,23 +323,25 @@ def run_bot():
 
             # Fetch news once per tick
             try:
-                news = get_latest_news()
+                sentiment = get_full_sentiment()
+            news = format_for_ai(sentiment)
+            whale_data = {coin: analyze_whales(coin) for coin in COINS}
             except Exception:
                 news = "News unavailable"
 
             # ── Scalp: every 5 min ─────────────────────────────────────────
             if now - last_run["scalp"] >= CYCLE_TIMES["scalp"]:
-                run_style("scalp", scalper.analyze, news)
+                run_style("scalp", scalper.analyze, news, whale_data)
                 last_run["scalp"] = now
 
             # ── Day trade: every 1 hour ────────────────────────────────────
             if now - last_run["day"] >= CYCLE_TIMES["day"]:
-                run_style("day", day_trader.analyze, news)
+                run_style("day", day_trader.analyze, news, whale_data)
                 last_run["day"] = now
 
             # ── Swing: every 4 hours ───────────────────────────────────────
             if now - last_run["swing"] >= CYCLE_TIMES["swing"]:
-                run_style("swing", swinger.analyze, news)
+                run_style("swing", swinger.analyze, news, whale_data)
                 last_run["swing"] = now
 
             # ── Daily performance report ───────────────────────────────────
