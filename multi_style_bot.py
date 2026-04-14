@@ -321,13 +321,18 @@ def run_bot():
                     log(f"⚠️ Macro failed: {e}")
                     shared_macro = None
 
-            # Fetch news once per tick
+            # Fetch news + whales once per tick
             try:
                 sentiment = get_full_sentiment()
-            news = format_for_ai(sentiment)
-            whale_data = {coin: analyze_whales(coin) for coin in COINS}
-            except Exception:
-                news = "News unavailable"
+                news = format_for_ai(sentiment)
+            except Exception as e:
+                log(f'⚠️ News error: {e}')
+                news = 'No news available'
+            try:
+                whale_data = {coin: analyze_whales(coin) for coin in COINS}
+            except Exception as e:
+                log(f'⚠️ Whale error: {e}')
+                whale_data = {}
 
             # ── Scalp: every 5 min ─────────────────────────────────────────
             if now - last_run["scalp"] >= CYCLE_TIMES["scalp"]:
