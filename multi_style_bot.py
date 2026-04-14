@@ -78,7 +78,7 @@ open_trades = {
 
 # Track last run time per style
 last_run = {style: 0 for style in ["scalp", "day", "swing"]}
-    open_positions = set()   # prevents stacking duplicate trades
+open_positions = set()   # prevents stacking duplicate trades
 
 # Shared macro (fetched once per day cycle)
 shared_macro = None
