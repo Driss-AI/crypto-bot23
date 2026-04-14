@@ -132,13 +132,13 @@ class TechnicalAgent:
             reasons.append("4H trend BEARISH (EMA50 < EMA200) ⚠️")
 
         # ── Convert score → signal ───────────────────────────
-        if score >= 4:
+        if score >= 3:
             signal, confidence = "BUY", "high"
-        elif score >= 2:
+        elif score >= 1:
             signal, confidence = "BUY", "medium"
-        elif score <= -4:
+        elif score <= -5:
             signal, confidence = "SELL", "high"
-        elif score <= -2:
+        elif score <= -3:
             signal, confidence = "SELL", "medium"
         else:
             signal, confidence = "HOLD", "low"

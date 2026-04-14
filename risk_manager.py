@@ -36,7 +36,9 @@ class RiskManager:
         else:
             risk_multiplier = 0.25
 
-        position_size = self.total_capital * self.max_risk_per_trade * risk_multiplier
+        style_capital = {"scalp": self.total_capital * 0.40, "day": self.total_capital * 0.40, "swing": self.total_capital * 0.20}
+        cap = style_capital.get(style, self.total_capital * 0.33)
+        position_size = cap * self.max_risk_per_trade * risk_multiplier
 
         # ── RULE 5: Minimum trade size ───────────────────
         min_size = max(1.0, self.total_capital * 0.005)  # ✅ FIXED: scales with capital
