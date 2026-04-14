@@ -6,7 +6,6 @@ agent signals, open trades, and memory stats.
 
 import os
 import json
-import ccxt
 import urllib.request
 from datetime import datetime
 from flask import Flask, render_template_string
@@ -37,14 +36,21 @@ def get_conn():
 
 def get_prices():
     prices = {}
-    for symbol in COINS:
-        try:
-            ticker = exchange.fetch_ticker(symbol)
+    try:
+        ids = ",".join(COINGECKO_IDS.values())
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd&include_24hr_change=true"
+        req = urllib.request.Request(url, headers={"User-Agent": "DrissBotDashboard/1.0"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read())
+        for symbol, cg_id in COINGECKO_IDS.items():
+            coin_data = data.get(cg_id, {})
             prices[symbol] = {
-                "price": ticker["last"],
-                "change": ticker["percentage"],
+                "price" : coin_data.get("usd", 0),
+                "change": coin_data.get("usd_24h_change", 0),
             }
-        except:
+    except Exception as e:
+        print(f"Price fetch error: {e}")
+        for symbol in COINS:
             prices[symbol] = {"price": 0, "change": 0}
     return prices
 
