@@ -10,7 +10,8 @@ import os
 
 from technical_agent import TechnicalAgent
 from onchain_agent   import OnChainAgent
-from news_fetcher    import get_latest_news
+from news_fetcher         import get_latest_news
+from grok_sentiment_agent import GrokSentimentAgent
 from risk_manager    import RiskManager
 from agent_memory    import AgentMemory
 
@@ -40,10 +41,15 @@ class Orchestrator:
                 print(f"  ⚠️ {name} failed: {e}")
                 results[name] = None
 
+        # Get price for Grok context
+        _price = 0
+        _fg    = ((self.shared_macro or {}).get("fear_greed") or {}).get("value", 50)
+
         threads = [
             threading.Thread(target=run, args=("technical", lambda: self.technical.analyze(symbol))),
             threading.Thread(target=run, args=("onchain",   lambda: self.onchain.analyze(symbol))),
             threading.Thread(target=run, args=("news",      lambda: {"text": get_latest_news()})),
+            threading.Thread(target=run, args=("grok",      lambda: self.grok.analyze(symbol, _price, _fg))),
         ]
         for t in threads: t.start()
         for t in threads: t.join(timeout=30)
@@ -52,11 +58,12 @@ class Orchestrator:
         onchain = results.get("onchain")
         macro   = self.shared_macro
         news    = (results.get("news") or {}).get("text","No news")
+        grok    = results.get("grok") or {}
 
         weights   = self._get_weights()
         consensus = self._compute_consensus(tech, macro, onchain, weights)
         raw_data  = tech["raw_data"] if tech else {}
-        final     = self._ask_claude(symbol, raw_data, macro, onchain, news, consensus, weights)
+        final     = self._ask_claude(symbol, raw_data, macro, onchain, news, consensus, weights, grok)
 
         price = raw_data.get("price", 0)
         approved, reason, details = self.rm.check_trade(final["action"], price, final["confidence"])
@@ -134,6 +141,9 @@ class Orchestrator:
             )
 
         wt = " | ".join(f"{k}:{v*100:.0f}%" for k,v in weights.items())
+        grok_mood    = (grok or {}).get("x_mood", "neutral") if grok else "unavailable"
+        grok_signal  = (grok or {}).get("signal", "HOLD") if grok else "HOLD"
+        grok_insight = (grok or {}).get("key_insight", "No X data") if grok else "No X data"
 
         prompt = f"""You are the master orchestrator of a multi-agent crypto trading system.
 Make the FINAL trading decision for {coin}/USDT.
@@ -155,6 +165,11 @@ Consensus: {consensus['score']:+.3f}
 {news[:500]}
 
 Weights: {wt}
+
+🐦 GROK X/TWITTER SENTIMENT (weight: 15%):
+X Mood: {grok_mood}
+Signal: {grok_signal}
+Key Insight: {grok_insight}
 
 Respond EXACTLY:
 ACTION: [BUY or SELL or HOLD]
