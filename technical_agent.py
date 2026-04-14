@@ -26,25 +26,25 @@ class TechnicalAgent:
         candles_1h = exchange.fetch_ohlcv(symbol, "1h", limit=100)
         df = pd.DataFrame(candles_1h, columns=["timestamp","open","high","low","close","volume"])
 
-        df["rsi"]        = ta.rsi(df["close"], length=14)
-        macd             = ta.macd(df["close"])
-        df["macd"]       = macd.iloc[:, 0]
-        df["macd_sig"]   = macd.iloc[:, 1]
-        bb               = ta.bbands(df["close"], length=20)
-        df["bb_upper"]   = bb.iloc[:, 0]
-        df["bb_lower"]   = bb.iloc[:, 1]
-        df["bb_mid"]     = bb.iloc[:, 2]
-        df["vol_avg"]    = df["volume"].rolling(20).mean()
+        df["rsi"]      = ta.rsi(df["close"], length=14)
+        macd           = ta.macd(df["close"])
+        df["macd"]     = macd.iloc[:, 0]   # MACD line
+        df["macd_sig"] = macd.iloc[:, 2]   # ✅ FIXED: signal line (was histogram)
+        bb             = ta.bbands(df["close"], length=20)
+        df["bb_lower"] = bb.iloc[:, 0]     # ✅ FIXED: BBL
+        df["bb_mid"]   = bb.iloc[:, 1]     # ✅ FIXED: BBM
+        df["bb_upper"] = bb.iloc[:, 2]     # ✅ FIXED: BBU
+        df["vol_avg"]  = df["volume"].rolling(20).mean()
 
         # ── 4H data ─────────────────────────────────────────
         candles_4h = exchange.fetch_ohlcv(symbol, "4h", limit=250)
         df4 = pd.DataFrame(candles_4h, columns=["timestamp","open","high","low","close","volume"])
         df4["rsi"]    = ta.rsi(df4["close"], length=14)
         df4["ema50"]  = ta.ema(df4["close"], length=50)
-        df4["ema200"] = ta.ema(df4["close"], length=50)
+        df4["ema200"] = ta.ema(df4["close"], length=200)  # ✅ FIXED: was length=50
 
-        r   = df.iloc[-1]
-        r4  = df4.iloc[-1]
+        r  = df.iloc[-1]
+        r4 = df4.iloc[-1]
 
         return {
             "symbol"   : symbol,
@@ -64,10 +64,6 @@ class TechnicalAgent:
         }
 
     def analyze(self, symbol: str) -> dict:
-        """
-        Score all indicators and return a signal the Orchestrator understands.
-        Output: { agent, signal, confidence, score, reasoning, raw_data }
-        """
         print(f"📊 Technical Agent analyzing {symbol}...")
         data = self.get_market_data(symbol)
 
@@ -98,13 +94,15 @@ class TechnicalAgent:
         elif rsi > 60:
             score -= 1
             reasons.append(f"RSI {rsi:.1f} — leaning overbought")
+        else:
+            reasons.append(f"RSI {rsi:.1f} — neutral")
 
         # ── MACD ─────────────────────────────────────────────
         if macd > macd_sig:
-            score += 1
+            score += 2
             reasons.append("MACD bullish crossover 📈")
         else:
-            score -= 1
+            score -= 2
             reasons.append("MACD bearish crossover 📉")
 
         # ── Bollinger Bands ──────────────────────────────────
@@ -114,6 +112,8 @@ class TechnicalAgent:
         elif price > bb_upper:
             score -= 2
             reasons.append("Price above upper BB — overbought stretch")
+        else:
+            reasons.append("Price inside BB — normal range")
 
         # ── Volume confirmation ──────────────────────────────
         if vol_ratio > 1.5:
@@ -125,10 +125,10 @@ class TechnicalAgent:
 
         # ── 4H trend filter ───────────────────────────────────
         if trend_4h == "BULLISH":
-            score += 1
+            score += 2
             reasons.append("4H trend BULLISH (EMA50 > EMA200) ✅")
         else:
-            score -= 1
+            score -= 2
             reasons.append("4H trend BEARISH (EMA50 < EMA200) ⚠️")
 
         # ── Convert score → signal ───────────────────────────
@@ -144,22 +144,21 @@ class TechnicalAgent:
             signal, confidence = "HOLD", "low"
 
         result = {
-            "agent"      : self.name,
-            "signal"     : signal,
-            "confidence" : confidence,
-            "score"      : score,
-            "reasoning"  : " | ".join(reasons),
-            "raw_data"   : data,
-            "sl_pct"     : 0.03,
-            "tp_pct"     : 0.06,
-            "size_pct"   : 0.02,
+            "agent"     : self.name,
+            "signal"    : signal,
+            "confidence": confidence,
+            "score"     : score,
+            "reasoning" : " | ".join(reasons),
+            "raw_data"  : data,
+            "sl_pct"    : 0.03,
+            "tp_pct"    : 0.06,
+            "size_pct"  : 0.02,
         }
 
         print(f"  → {signal} ({confidence}) | score: {score:+d}")
         return result
 
 
-# ── Standalone test ──────────────────────────────────────
 if __name__ == "__main__":
     agent = TechnicalAgent()
     result = agent.analyze("BTC/USDT")
