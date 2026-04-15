@@ -228,7 +228,7 @@ def execute(style, symbol, agent_result, final, macro):
         tp_pct = agent_result.get("tp_pct", 0.06)
         tp  = price * (1 + tp_pct) if action == "BUY" else price * (1 - agent_result["tp_pct"])
         size_pct = agent_result.get("size_pct", 0.02)
-        size = max(STYLE_CAPITAL[style] * size_pct, 20)  # actual USD
+        size = details["position_size_usd"]  # ✅ use risk manager approved size
 
         trade_id = record_trade(action, price, sl, tp, size, conf)
         open_trades[style][symbol] = trade_id
