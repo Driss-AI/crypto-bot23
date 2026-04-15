@@ -164,7 +164,7 @@ RISKS: [1 key risk]
 """
 
     msg = client.messages.create(
-        model="claude-opus-4-6", max_tokens=200,
+        model=("claude-haiku-4-5-20251001" if style == "scalp" else "claude-sonnet-4-6"), max_tokens=200,
         messages=[{"role": "user", "content": prompt}]
     )
     text = msg.content[0].text
@@ -209,7 +209,7 @@ def execute(style, symbol, agent_result, final, macro):
 
     rm       = risk_managers[style][coin + "/USDT" if "/" not in coin else coin]
     rm       = risk_managers[style][symbol]
-    approved, reason, details = rm.check_trade(action, price, conf)
+    approved, reason, details = rm.check_trade(action, price, conf, style)
 
     style_emoji = {"scalp": "🔥", "day": "📈", "swing": "🌊"}[style]
     ae = "🟢" if action == "BUY" else "🔴" if action == "SELL" else "🟡"

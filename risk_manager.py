@@ -12,9 +12,9 @@ class RiskManager:
         self.trades_today       = 0
         self.max_trades_day     = 20     # ✅ FIXED: was 5, too restrictive for 3 styles × 4 coins
 
-    def check_trade(self, action, price, confidence="medium"):
+    def check_trade(self, action, price, confidence="medium", style="scalp"):
         print("\n🛡️  RISK MANAGER CHECKING TRADE...")
-        print(f"   Action: {action} | Price: ${price:,.2f} | Confidence: {confidence}")
+        print(f"   Action: {action} | Price: ${price:,.2f} | Confidence: {confidence} | Style: {style}")
 
         # ── RULE 1: Daily loss limit ─────────────────────
         if self.daily_loss >= self.max_daily_loss * self.total_capital:
