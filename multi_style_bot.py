@@ -188,6 +188,7 @@ def check_exits(style, symbol, price):
         coin  = symbol.replace("/USDT", "")
         emoji = {"scalp": "🔥", "day": "📈", "swing": "🌊"}[style]
         log(f"🏁 [{style.upper()}] {coin} trade #{trade_id} closed!")
+        memory.record_trade_exit(symbol, trade_id, price)
         open_trades[style][symbol] = None
         send_telegram(
             f"🏁 <b>{emoji} {style.upper()} {coin} Trade Closed!</b>\n\n"
@@ -269,9 +270,12 @@ def run_style(style, agent_fn, news, whale_data=None):
 
     for symbol in COINS:
         coin = symbol.replace("/USDT", "")
+        if open_trades[style][symbol] is not None:
+            log(f"⏭️  [{style.upper()}] {coin} — trade open, skipping")
+            continue
         try:
             result = agent_fn(symbol)
-            final  = ask_claude(symbol, style, result, shared_macro, news)
+            final  = ask_claude(symbol, style, result, shared_macro, news, whale_data)
             execute(style, symbol, result, final, shared_macro)
             time.sleep(3)
         except Exception as e:
