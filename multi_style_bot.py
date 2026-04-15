@@ -84,6 +84,22 @@ open_positions = set()   # prevents stacking duplicate trades
 shared_macro = None
 
 
+def sync_open_trades_from_db():
+    """On startup, reload open trades from paper_trades into open_trades dict."""
+    try:
+        import psycopg2
+        conn = psycopg2.connect(os.getenv("DATABASE_URL"), sslmode="require")
+        cur  = conn.cursor()
+        cur.execute("""
+            SELECT id, action FROM paper_trades WHERE status='OPEN'
+        """)
+        rows = cur.fetchall()
+        conn.close()
+        log(f"🔄 Found {len(rows)} open trades in DB on startup")
+    except Exception as e:
+        log(f"⚠️ DB sync on startup failed: {e}")
+
+
 # ── UTILITIES ─────────────────────────────────────────────
 
 def log(msg):
@@ -306,6 +322,7 @@ def run_bot():
     )
 
     cycle = 0
+    sync_open_trades_from_db()
 
     while True:
         try:
