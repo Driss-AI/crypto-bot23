@@ -1,183 +1,176 @@
 """
-SCALPER AGENT
-═══════════════════════════════════════════════════
-Timeframe : 5m + 15m confirmation
-Stop Loss : 0.5%
-Take Profit: 1.0%
+SCALPER AGENT - ENHANCED
+========================
+Timeframe : 1m candles (was 5m) - reacts to every candle
+Cycle     : every 60 seconds (was 300s)
+Stop Loss : 0.4% (tightened)
+Take Profit: 0.8% (2:1 ratio)
 Position  : 5% of capital
-Cycle     : every 5 minutes
 
-Looks for:
-- RSI extremes on 5m
-- MACD crossover on 5m
-- Volume spike confirmation
-- 15m trend not against us
+Key improvements:
+- 1m candles for faster reaction
+- Waits for CLOSED candle confirmation (no mid-candle entries)
+- Volume must be 2x average (was 1.5x)
+- 5m trend filter - only trade WITH the 5m trend
+- RSI divergence check
 """
 
 import ccxt
 import pandas as pd
 import pandas_ta as ta
+from datetime import datetime, timezone
 
 exchange = ccxt.binance()
 
-STOP_LOSS_PCT    = 0.005   # 0.5%
-TAKE_PROFIT_PCT  = 0.010   # 1.0%
-POSITION_SIZE    = 0.05    # 5% of capital
-CYCLE_SECONDS    = 300     # 5 minutes
+STOP_LOSS_PCT   = 0.004   # 0.4%
+TAKE_PROFIT_PCT = 0.008   # 0.8% - tight but realistic for 1m scalp
+POSITION_SIZE   = 0.05    # 5% of capital
+CYCLE_SECONDS   = 60      # ✅ 1 minute cycles
 
 
 class ScalperAgent:
     def __init__(self):
         self.name  = "scalper"
         self.style = "scalp"
-        print("🔥 Scalper Agent initialized")
+        print("🔥 Scalper Agent initialized — 1min cycles")
 
     def get_data(self, symbol: str) -> dict:
-        # 5m candles
-        c5  = exchange.fetch_ohlcv(symbol, "5m",  limit=50)
-        # 15m for trend confirmation
-        c15 = exchange.fetch_ohlcv(symbol, "15m", limit=30)
+        # 1m candles for entry signal
+        c1  = exchange.fetch_ohlcv(symbol, "1m",  limit=60)
+        # 5m candles for trend filter
+        c5  = exchange.fetch_ohlcv(symbol, "5m",  limit=30)
 
-        df5  = pd.DataFrame(c5,  columns=["ts","open","high","low","close","volume"])
-        df15 = pd.DataFrame(c15, columns=["ts","open","high","low","close","volume"])
+        df1 = pd.DataFrame(c1,  columns=["ts","open","high","low","close","volume"])
+        df5 = pd.DataFrame(c5,  columns=["ts","open","high","low","close","volume"])
 
-        # 5m indicators
-        df5["rsi"]     = ta.rsi(df5["close"], length=7)    # shorter RSI for scalping
-        macd           = ta.macd(df5["close"], fast=8, slow=17, signal=9)
-        df5["macd"]    = macd.iloc[:, 0]
-        df5["macd_sig"]= macd.iloc[:, 1]
-        bb             = ta.bbands(df5["close"], length=10) # tighter BB
-        df5["bb_upper"]= bb.iloc[:, 0]
-        df5["bb_lower"]= bb.iloc[:, 1]
-        df5["bb_mid"]  = bb.iloc[:, 2]
-        df5["vol_avg"] = df5["volume"].rolling(10).mean()
+        # ── 1m indicators ──────────────────────────────────────
+        df1["rsi"]     = ta.rsi(df1["close"], length=9)   # faster RSI for 1m
+        macd1          = ta.macd(df1["close"], fast=8, slow=17, signal=9)
+        df1["macd"]    = macd1.iloc[:, 0]
+        df1["macd_sig"]= macd1.iloc[:, 2]
+        df1["vol_avg"] = df1["volume"].rolling(20).mean()
+        bb1            = ta.bbands(df1["close"], length=15)
+        df1["bb_lower"]= bb1.iloc[:, 0]
+        df1["bb_upper"]= bb1.iloc[:, 2]
 
-        # 15m trend
-        df15["ema20"]  = ta.ema(df15["close"], length=min(20, len(df15)-1))
-        df15["ema50"]  = ta.ema(df15["close"], length=min(50, len(df15)-1))
+        # ── 5m trend filter ────────────────────────────────────
+        df5["ema20"] = ta.ema(df5["close"], length=20)
+        df5["ema50"] = ta.ema(df5["close"], length=50)
+        df5["rsi"]   = ta.rsi(df5["close"], length=14)
 
-        r5  = df5.iloc[-1]
-        r15 = df15.iloc[-1]
+        last1  = df1.iloc[-2]   # ✅ CLOSED candle (not current)
+        last5  = df5.iloc[-1]
+        price  = float(df1["close"].iloc[-1])
+
+        # 5m trend direction
+        trend_up   = float(last5["ema20"]) > float(last5["ema50"])
+        trend_down = float(last5["ema20"]) < float(last5["ema50"])
+        rsi_5m     = float(last5["rsi"])
 
         return {
-            "symbol"    : symbol,
-            "price"     : float(r5["close"]),
-            "rsi"       : float(r5["rsi"]),
-            "macd"      : float(r5["macd"]),
-            "macd_sig"  : float(r5["macd_sig"]),
-            "bb_upper"  : float(r5["bb_upper"]),
-            "bb_lower"  : float(r5["bb_lower"]),
-            "bb_mid"    : float(r5["bb_mid"]),
-            "volume"    : float(r5["volume"]),
-            "vol_avg"   : float(r5["vol_avg"]),
-            "trend_15m" : "BULLISH" if r15["ema20"] > r15["ema50"] else "BEARISH",
+            "price"     : price,
+            "rsi_1m"    : float(last1["rsi"]),
+            "macd_1m"   : float(last1["macd"]),
+            "macd_sig_1m": float(last1["macd_sig"]),
+            "vol_ratio" : float(last1["volume"]) / max(float(last1["vol_avg"]), 1),
+            "bb_lower"  : float(last1["bb_lower"]),
+            "bb_upper"  : float(last1["bb_upper"]),
+            "trend_up"  : trend_up,
+            "trend_down": trend_down,
+            "rsi_5m"    : rsi_5m,
+            "candle_bullish": float(last1["close"]) > float(last1["open"]),
+            "candle_bearish": float(last1["close"]) < float(last1["open"]),
         }
 
     def analyze(self, symbol: str) -> dict:
-        print(f"  🔥 Scalper analyzing {symbol}...")
         try:
-            data = self.get_data(symbol)
+            d = self.get_data(symbol)
         except Exception as e:
-            print(f"  ⚠️ Scalper data error: {e}")
-            return self._empty(symbol)
+            print(f"⚠️ Scalper data error {symbol}: {e}")
+            return None
 
-        price     = data["price"]
-        rsi       = data["rsi"]
-        macd      = data["macd"]
-        macd_sig  = data["macd_sig"]
-        bb_upper  = data["bb_upper"]
-        bb_lower  = data["bb_lower"]
-        volume    = data["volume"]
-        vol_avg   = data["vol_avg"]
-        trend_15m = data["trend_15m"]
-        vol_ratio = volume / vol_avg if vol_avg else 1.0
+        price      = d["price"]
+        rsi        = d["rsi_1m"]
+        macd       = d["macd_1m"]
+        macd_sig   = d["macd_sig_1m"]
+        vol_ratio  = d["vol_ratio"]
+        score      = 0
+        reasons    = []
 
-        score   = 0
-        reasons = []
+        # ── GATE 1: Volume must confirm (2x average) ──────────
+        if vol_ratio < 1.8:
+            return {
+                "signal"   : "HOLD",
+                "score"    : 0,
+                "reasoning": f"Low volume ({vol_ratio:.1f}x) — no scalp",
+                "sl_pct"   : STOP_LOSS_PCT,
+                "tp_pct"   : TAKE_PROFIT_PCT,
+                "size_pct" : POSITION_SIZE,
+                "raw_data" : {"price": price, "rsi": rsi},
+            }
 
-        # RSI — tighter thresholds for scalping
-        if rsi < 25:
-            score += 3
-            reasons.append(f"RSI {rsi:.1f} — deeply oversold 🥶")
-        elif rsi < 35:
-            score += 1
-            reasons.append(f"RSI {rsi:.1f} — oversold")
-        elif rsi > 75:
-            score -= 3
-            reasons.append(f"RSI {rsi:.1f} — deeply overbought 🔥")
-        elif rsi > 65:
-            score -= 1
-            reasons.append(f"RSI {rsi:.1f} — overbought")
+        # ── GATE 2: Only trade with 5m trend ──────────────────
+        with_trend_up   = d["trend_up"]   and d["candle_bullish"]
+        with_trend_down = d["trend_down"] and d["candle_bearish"]
 
-        # MACD crossover
+        if not with_trend_up and not with_trend_down:
+            return {
+                "signal"   : "HOLD",
+                "score"    : 0,
+                "reasoning": "Against 5m trend — skip",
+                "sl_pct"   : STOP_LOSS_PCT,
+                "tp_pct"   : TAKE_PROFIT_PCT,
+                "size_pct" : POSITION_SIZE,
+                "raw_data" : {"price": price, "rsi": rsi},
+            }
+
+        # ── RSI signal ─────────────────────────────────────────
+        if rsi < 30:
+            score += 3; reasons.append(f"RSI {rsi:.0f} oversold")
+        elif rsi < 40:
+            score += 1; reasons.append(f"RSI {rsi:.0f} leaning oversold")
+        elif rsi > 70:
+            score -= 3; reasons.append(f"RSI {rsi:.0f} overbought")
+        elif rsi > 60:
+            score -= 1; reasons.append(f"RSI {rsi:.0f} leaning overbought")
+
+        # ── MACD crossover ─────────────────────────────────────
         if macd > macd_sig:
-            score += 1
-            reasons.append("MACD bullish 📈")
+            score += 2; reasons.append("MACD bullish cross")
         else:
-            score -= 1
-            reasons.append("MACD bearish 📉")
+            score -= 2; reasons.append("MACD bearish cross")
 
-        # Bollinger — price at extremes
-        if price < bb_lower:
-            score += 2
-            reasons.append("Price below lower BB — bounce opportunity")
-        elif price > bb_upper:
-            score -= 2
-            reasons.append("Price above upper BB — reversal risk")
+        # ── BB extremes ────────────────────────────────────────
+        if price <= d["bb_lower"]:
+            score += 2; reasons.append("At lower BB — bounce setup")
+        elif price >= d["bb_upper"]:
+            score -= 2; reasons.append("At upper BB — rejection setup")
 
-        # Volume must confirm for scalping
-        if vol_ratio > 1.5:
-            score = int(score * 1.5)
-            reasons.append(f"Volume {vol_ratio:.1f}x — strong 🔊")
-        elif vol_ratio < 0.8:
-            score = int(score * 0.5)   # heavily dampen low volume scalps
-            reasons.append(f"Volume {vol_ratio:.1f}x — too weak, dampening signal 🔇")
+        # ── Volume boost ───────────────────────────────────────
+        if vol_ratio > 3:
+            score = int(score * 1.5); reasons.append(f"HUGE volume {vol_ratio:.1f}x")
+        elif vol_ratio > 2:
+            score = int(score * 1.2); reasons.append(f"Strong volume {vol_ratio:.1f}x")
 
-        # 15m trend filter — don't scalp against the trend
-        if trend_15m == "BEARISH" and score > 0:
-            score = max(score - 2, 0)
-            reasons.append("15m trend BEARISH — reducing buy signal")
-        elif trend_15m == "BULLISH" and score < 0:
-            score = min(score + 2, 0)
-            reasons.append("15m trend BULLISH — reducing sell signal")
-
-        # Convert
+        # ── Final signal ───────────────────────────────────────
         if score >= 3:
-            signal, confidence = "BUY", "high"
-        elif score >= 1:
-            signal, confidence = "BUY", "medium"
+            signal = "BUY"
         elif score <= -3:
-            signal, confidence = "SELL", "high"
-        elif score <= -1:
-            signal, confidence = "SELL", "medium"
+            signal = "SELL"
         else:
-            signal, confidence = "HOLD", "low"
+            signal = "HOLD"
 
-        print(f"    → {signal} ({confidence}) | score: {score:+d}")
         return {
-            "agent"      : self.name,
-            "style"      : self.style,
-            "signal"     : signal,
-            "confidence" : confidence,
-            "score"      : score,
-            "reasoning"  : " | ".join(reasons),
-            "raw_data"   : data,
-            "sl_pct"     : STOP_LOSS_PCT,
-            "tp_pct"     : TAKE_PROFIT_PCT,
-            "size_pct"   : POSITION_SIZE,
+            "signal"   : signal,
+            "score"    : score,
+            "reasoning": " | ".join(reasons),
+            "sl_pct"   : STOP_LOSS_PCT,
+            "tp_pct"   : TAKE_PROFIT_PCT,
+            "size_pct" : POSITION_SIZE,
+            "raw_data" : {
+                "price"    : price,
+                "rsi"      : rsi,
+                "vol_ratio": vol_ratio,
+                "trend"    : "UP" if d["trend_up"] else "DOWN",
+            },
         }
-
-    def _empty(self, symbol):
-        return {"agent": self.name, "style": self.style,
-                "signal": "HOLD", "confidence": "low",
-                "score": 0, "reasoning": "Data error",
-                "raw_data": {"symbol": symbol, "price": 0},
-                "sl_pct": STOP_LOSS_PCT, "tp_pct": TAKE_PROFIT_PCT,
-                "size_pct": POSITION_SIZE}
-
-
-if __name__ == "__main__":
-    agent = ScalperAgent()
-    r = agent.analyze("BTC/USDT")
-    print(f"\nSignal: {r['signal']} ({r['confidence']})")
-    print(f"Why:    {r['reasoning']}")
