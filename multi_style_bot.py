@@ -1,11 +1,11 @@
 """
 MULTI-STYLE BOT
-Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
-Runs 3 trading styles ÃÂ 4 coins = 12 independent strategies
+ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+Runs 3 trading styles ÃÂÃÂ 4 coins = 12 independent strategies
 
-Ã°ÂÂÂ¥ Scalper    Ã¢ÂÂ every 5 min  | SL 0.5% | TP 1%  | 5% size
-Ã°ÂÂÂ Day Trader Ã¢ÂÂ every 1 hour | SL 3%   | TP 6%  | 2% size
-Ã°ÂÂÂ Swing      Ã¢ÂÂ every 4 hours| SL 8%   | TP 16% | 1% size
+ÃÂ°ÃÂÃÂÃÂ¥ Scalper    ÃÂ¢ÃÂÃÂ every 5 min  | SL 0.5% | TP 1%  | 5% size
+ÃÂ°ÃÂÃÂÃÂ Day Trader ÃÂ¢ÃÂÃÂ every 1 hour | SL 3%   | TP 6%  | 2% size
+ÃÂ°ÃÂÃÂÃÂ Swing      ÃÂ¢ÃÂÃÂ every 4 hours| SL 8%   | TP 16% | 1% size
 
 Each style runs independently and manages its own trades.
 All decisions go through Claude + RiskManager.
@@ -30,7 +30,7 @@ from agent_memory    import AgentMemory
 
 load_dotenv()
 
-# Ã¢ÂÂÃ¢ÂÂ CONFIG Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ CONFIG ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 TELEGRAM_TOKEN   = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 LOG_FILE         = "bot_log.txt"
@@ -47,12 +47,12 @@ STYLE_CAPITAL = {
 
 # Cycle times in seconds
 CYCLE_TIMES = {
-    "scalp": 60,     # ✅ 1 min — scalping needs fast reaction
+    "scalp": 60,     # â 1 min â scalping needs fast reaction
     "day"  : 3600,   # 1 hour
     "swing": 14400,  # 4 hours
 }
 
-# Ã¢ÂÂÃ¢ÂÂ INIT Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ INIT ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 client      = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 memory      = AgentMemory()
 macro_agent = MacroAgent()
@@ -71,7 +71,7 @@ risk_managers = {
     for style in ["scalp", "day", "swing"]
 }
 
-# Track open trades: style Ã¢ÂÂ coin Ã¢ÂÂ trade_id
+# Track open trades: style ÃÂ¢ÃÂÃÂ coin ÃÂ¢ÃÂÃÂ trade_id
 open_trades = {
     style: {coin: None for coin in COINS}
     for style in ["scalp", "day", "swing"]
@@ -96,12 +96,12 @@ def sync_open_trades_from_db():
         """)
         rows = cur.fetchall()
         conn.close()
-        log(f"Ã°ÂÂÂ Found {len(rows)} open trades in DB on startup")
+        log(f"ÃÂ°ÃÂÃÂÃÂ Found {len(rows)} open trades in DB on startup")
     except Exception as e:
-        log(f"Ã¢ÂÂ Ã¯Â¸Â DB sync on startup failed: {e}")
+        log(f"ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ DB sync on startup failed: {e}")
 
 
-# Ã¢ÂÂÃ¢ÂÂ UTILITIES Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ UTILITIES ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 def log(msg):
     ts   = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -120,12 +120,12 @@ def send_telegram(msg):
             "chat_id": TELEGRAM_CHAT_ID, "text": msg, 
         }, timeout=10)
         if not r.json().get("ok"):
-            print(f"Ã¢ÂÂ Ã¯Â¸Â Telegram: {r.text[:80]}")
+            print(f"ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ Telegram: {r.text[:80]}")
     except Exception as e:
-        print(f"Ã¢ÂÂ Ã¯Â¸Â Telegram error: {e}")
+        print(f"ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ Telegram error: {e}")
 
 
-# Ã¢ÂÂÃ¢ÂÂ CLAUDE DECISION Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ CLAUDE DECISION ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 def ask_claude(symbol, style, agent_result, macro, news, whale_data=None) -> dict:
     coin   = symbol.replace("/USDT", "")
@@ -133,7 +133,7 @@ def ask_claude(symbol, style, agent_result, macro, news, whale_data=None) -> dic
     signal = agent_result.get("signal", "HOLD")
     score  = agent_result.get("score", 0)
 
-    style_emoji = {"scalp": "Ã°ÂÂÂ¥", "day": "Ã°ÂÂÂ", "swing": "Ã°ÂÂÂ"}[style]
+    style_emoji = {"scalp": "ÃÂ°ÃÂÃÂÃÂ¥", "day": "ÃÂ°ÃÂÃÂÃÂ", "swing": "ÃÂ°ÃÂÃÂÃÂ"}[style]
     style_name  = {"scalp": "SCALP", "day": "DAY TRADE", "swing": "SWING"}[style]
 
     macro_text = "Macro unavailable"
@@ -155,15 +155,15 @@ def ask_claude(symbol, style, agent_result, macro, news, whale_data=None) -> dic
 - Take Profit: {agent_result['tp_pct']*100:.1f}%
 - Position Size: {agent_result['size_pct']*100:.0f}% of allocated capital
 
-Ã°ÂÂÂ {style_name} AGENT SIGNAL: {signal} (score: {score:+d})
+ÃÂ°ÃÂÃÂÃÂ {style_name} AGENT SIGNAL: {signal} (score: {score:+d})
 Why: {agent_result.get('reasoning', '')}
 
-Ã°ÂÂÂ° Market: {coin}/USDT @ ${data.get('price', 0):,.2f}
+ÃÂ°ÃÂÃÂÃÂ° Market: {coin}/USDT @ ${data.get('price', 0):,.2f}
 
-Ã°ÂÂÂ MACRO:
+ÃÂ°ÃÂÃÂÃÂ MACRO:
 {macro_text}
 
-Ã°ÂÂÂ° SENTIMENT (summary):
+ÃÂ°ÃÂÃÂÃÂ° SENTIMENT (summary):
 {news[:400]}
 
 ECONOMIC CALENDAR:
@@ -178,10 +178,10 @@ REASONING: [1-2 sentences specific to {style_name} style]
 RISKS: [1 key risk]
 
 {style_name} rules:
-{"- Only scalp when volume is HIGH Ã¢ÂÂ never trade thin markets" if style == "scalp" else ""}
+{"- Only scalp when volume is HIGH ÃÂ¢ÃÂÃÂ never trade thin markets" if style == "scalp" else ""}
 {"- Confirm with both 1h and 4h before entering" if style == "day" else ""}
-{"- Only swing trade with 1D trend Ã¢ÂÂ never fight the daily" if style == "swing" else ""}
-- HOLD is always valid Ã¢ÂÂ missing a trade is better than a bad trade
+{"- Only swing trade with 1D trend ÃÂ¢ÃÂÃÂ never fight the daily" if style == "swing" else ""}
+- HOLD is always valid ÃÂ¢ÃÂÃÂ missing a trade is better than a bad trade
 """
 
     msg = client.messages.create(
@@ -198,7 +198,7 @@ RISKS: [1 key risk]
     return {"action": a, "confidence": c, "reasoning": r, "risks": ri}
 
 
-# Ã¢ÂÂÃ¢ÂÂ TRADE EXECUTION Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ TRADE EXECUTION ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 def check_exits(style, symbol, price):
     trade_id = open_trades[style][symbol]
@@ -207,12 +207,12 @@ def check_exits(style, symbol, price):
     hit = update_trade(trade_id, price)
     if hit:
         coin  = symbol.replace("/USDT", "")
-        emoji = {"scalp": "Ã°ÂÂÂ¥", "day": "Ã°ÂÂÂ", "swing": "Ã°ÂÂÂ"}[style]
-        log(f"Ã°ÂÂÂ [{style.upper()}] {coin} trade #{trade_id} closed!")
+        emoji = {"scalp": "ÃÂ°ÃÂÃÂÃÂ¥", "day": "ÃÂ°ÃÂÃÂÃÂ", "swing": "ÃÂ°ÃÂÃÂÃÂ"}[style]
+        log(f"ÃÂ°ÃÂÃÂÃÂ [{style.upper()}] {coin} trade #{trade_id} closed!")
         memory.record_trade_exit(symbol, trade_id, price)
         open_trades[style][symbol] = None
         send_telegram(
-            f"Ã°ÂÂÂ <b>{emoji} {style.upper()} {coin} Trade Closed!</b>\n\n"
+            f"ÃÂ°ÃÂÃÂÃÂ <b>{emoji} {style.upper()} {coin} Trade Closed!</b>\n\n"
             f"{get_performance_report()}"
         )
 
@@ -224,7 +224,7 @@ def execute(style, symbol, agent_result, final, macro):
     price  = (agent_result.get("raw_data") or {}).get("price", 0)
 
     if price == 0:
-        log(f"  Ã¢ÂÂ Ã¯Â¸Â [{style}] {coin}: price is 0, skipping")
+        log(f"  ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ [{style}] {coin}: price is 0, skipping")
         return
 
     check_exits(style, symbol, price)
@@ -233,14 +233,14 @@ def execute(style, symbol, agent_result, final, macro):
     rm       = risk_managers[style][symbol]
     approved, reason, details = rm.check_trade(action, price, conf, style)
 
-    style_emoji = {"scalp": "Ã°ÂÂÂ¥", "day": "Ã°ÂÂÂ", "swing": "Ã°ÂÂÂ"}[style]
-    ae = "Ã°ÂÂÂ¢" if action == "BUY" else "Ã°ÂÂÂ´" if action == "SELL" else "Ã°ÂÂÂ¡"
+    style_emoji = {"scalp": "ÃÂ°ÃÂÃÂÃÂ¥", "day": "ÃÂ°ÃÂÃÂÃÂ", "swing": "ÃÂ°ÃÂÃÂÃÂ"}[style]
+    ae = "ÃÂ°ÃÂÃÂÃÂ¢" if action == "BUY" else "ÃÂ°ÃÂÃÂÃÂ´" if action == "SELL" else "ÃÂ°ÃÂÃÂÃÂ¡"
 
     msg = (
         f"{style_emoji} <b>[{style.upper()}] {coin}</b>\n"
-        f"Ã°ÂÂÂ° ${price:,.2f} | {ae} <b>{action}</b> ({conf.upper()})\n"
-        f"Ã°ÂÂ§Â  {final['reasoning']}\n"
-        f"Ã¢ÂÂ Ã¯Â¸Â {final['risks']}"
+        f"ÃÂ°ÃÂÃÂÃÂ° ${price:,.2f} | {ae} <b>{action}</b> ({conf.upper()})\n"
+        f"ÃÂ°ÃÂÃÂ§ÃÂ  {final['reasoning']}\n"
+        f"ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ {final['risks']}"
     )
 
     if approved and not open_trades[style][symbol] and action != "HOLD":
@@ -250,7 +250,7 @@ def execute(style, symbol, agent_result, final, macro):
         tp_pct = agent_result.get("tp_pct", 0.06)
         tp  = price * (1 + tp_pct) if action == "BUY" else price * (1 - agent_result["tp_pct"])
         size_pct = agent_result.get("size_pct", 0.02)
-        size = details["position_size_usd"]  # Ã¢ÂÂ use risk manager approved size
+        size = details["position_size_usd"]  # ÃÂ¢ÃÂÃÂ use risk manager approved size
 
         trade_id = record_trade(action, price, sl, tp, size, conf)
         open_trades[style][symbol] = trade_id
@@ -266,33 +266,33 @@ def execute(style, symbol, agent_result, final, macro):
         memory.record_trade_entry(symbol, action, price, signals, final["reasoning"], conf)
 
         msg += (
-            f"\n\nÃ¢ÂÂ <b>TRADE #{trade_id}</b>\n"
+            f"\n\nÃÂ¢ÃÂÃÂ <b>TRADE #{trade_id}</b>\n"
             f"SL: ${sl:,.2f} | TP: ${tp:,.2f} | Size: ${size:.0f}"
         )
-        log(f"Ã°ÂÂÂ [{style.upper()}] {coin} #{trade_id}: {action} @ ${price:,.2f}")
+        log(f"ÃÂ°ÃÂÃÂÃÂ [{style.upper()}] {coin} #{trade_id}: {action} @ ${price:,.2f}")
 
     elif open_trades[style][symbol]:
-        msg += f"\nÃ¢ÂÂ³ Trade #{open_trades[style][symbol]} open"
-        log(f"Ã¢ÂÂ³ [{style.upper()}] {coin}: holding #{open_trades[style][symbol]}")
+        msg += f"\nÃÂ¢ÃÂÃÂ³ Trade #{open_trades[style][symbol]} open"
+        log(f"ÃÂ¢ÃÂÃÂ³ [{style.upper()}] {coin}: holding #{open_trades[style][symbol]}")
     else:
-        msg += f"\nÃ¢ÂÂ¸Ã¯Â¸Â {reason}"
-        log(f"Ã¢ÂÂ¸Ã¯Â¸Â [{style.upper()}] {coin}: {action} Ã¢ÂÂ {reason}")
+        msg += f"\nÃÂ¢ÃÂÃÂ¸ÃÂ¯ÃÂ¸ÃÂ {reason}"
+        log(f"ÃÂ¢ÃÂÃÂ¸ÃÂ¯ÃÂ¸ÃÂ [{style.upper()}] {coin}: {action} ÃÂ¢ÃÂÃÂ {reason}")
 
     send_telegram(msg)
 
 
-# Ã¢ÂÂÃ¢ÂÂ STYLE RUNNERS Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ STYLE RUNNERS ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 def run_style(style, agent_fn, news, whale_data=None):
     """Run one style across all coins."""
     global shared_macro
-    style_emoji = {"scalp": "Ã°ÂÂÂ¥", "day": "Ã°ÂÂÂ", "swing": "Ã°ÂÂÂ"}[style]
+    style_emoji = {"scalp": "ÃÂ°ÃÂÃÂÃÂ¥", "day": "ÃÂ°ÃÂÃÂÃÂ", "swing": "ÃÂ°ÃÂÃÂÃÂ"}[style]
     log(f"\n{style_emoji} Running {style.upper()} cycle...")
 
     for symbol in COINS:
         coin = symbol.replace("/USDT", "")
         if open_trades[style][symbol] is not None:
-            log(f"Ã¢ÂÂ­Ã¯Â¸Â  [{style.upper()}] {coin} Ã¢ÂÂ trade open, skipping")
+            log(f"ÃÂ¢ÃÂÃÂ­ÃÂ¯ÃÂ¸ÃÂ  [{style.upper()}] {coin} ÃÂ¢ÃÂÃÂ trade open, skipping")
             continue
         if style in ("scalp", "day"):
             blackout, reason = is_news_blackout()
@@ -305,30 +305,30 @@ def run_style(style, agent_fn, news, whale_data=None):
             execute(style, symbol, result, final, shared_macro)
             time.sleep(3)
         except Exception as e:
-            log(f"Ã¢ÂÂ Ã¯Â¸Â [{style}] {coin} error: {e}")
+            log(f"ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ [{style}] {coin} error: {e}")
             continue
 
 
-# Ã¢ÂÂÃ¢ÂÂ MAIN LOOP Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ MAIN LOOP ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 def run_bot():
     global shared_macro
 
     log("="*55)
-    log("Ã°ÂÂÂ MULTI-STYLE BOT STARTING")
-    log(f"Ã°ÂÂÂ¥ Scalp: every 5min | Ã°ÂÂÂ Day: every 1h | Ã°ÂÂÂ Swing: every 4h")
-    log(f"Ã°ÂÂÂ Coins: {', '.join(COINS)}")
-    log(f"Ã°ÂÂÂ° Capital: Scalp ${STYLE_CAPITAL['scalp']:.0f} | "
+    log("ÃÂ°ÃÂÃÂÃÂ MULTI-STYLE BOT STARTING")
+    log(f"ÃÂ°ÃÂÃÂÃÂ¥ Scalp: every 5min | ÃÂ°ÃÂÃÂÃÂ Day: every 1h | ÃÂ°ÃÂÃÂÃÂ Swing: every 4h")
+    log(f"ÃÂ°ÃÂÃÂÃÂ Coins: {', '.join(COINS)}")
+    log(f"ÃÂ°ÃÂÃÂÃÂ° Capital: Scalp ${STYLE_CAPITAL['scalp']:.0f} | "
         f"Day ${STYLE_CAPITAL['day']:.0f} | Swing ${STYLE_CAPITAL['swing']:.0f}")
     log("="*55)
 
     send_telegram(
-        "Ã°ÂÂÂ <b>Multi-Style Bot Started!</b>\n\n"
-        "Ã°ÂÂÂ¥ <b>Scalp</b>: every 5min | SL 0.5% | TP 1%\n"
-        "Ã°ÂÂÂ <b>Day Trade</b>: every 1h | SL 3% | TP 6%\n"
-        "Ã°ÂÂÂ <b>Swing</b>: every 4h | SL 8% | TP 16%\n\n"
-        f"Ã°ÂÂÂ Coins: BTC / ETH / SOL / BNB\n"
-        f"Ã°ÂÂÂ° Total: ${TOTAL_CAPITAL:.0f}"
+        "ÃÂ°ÃÂÃÂÃÂ <b>Multi-Style Bot Started!</b>\n\n"
+        "ÃÂ°ÃÂÃÂÃÂ¥ <b>Scalp</b>: every 5min | SL 0.5% | TP 1%\n"
+        "ÃÂ°ÃÂÃÂÃÂ <b>Day Trade</b>: every 1h | SL 3% | TP 6%\n"
+        "ÃÂ°ÃÂÃÂÃÂ <b>Swing</b>: every 4h | SL 8% | TP 16%\n\n"
+        f"ÃÂ°ÃÂÃÂÃÂ Coins: BTC / ETH / SOL / BNB\n"
+        f"ÃÂ°ÃÂÃÂÃÂ° Total: ${TOTAL_CAPITAL:.0f}"
     )
 
     cycle = 0
@@ -339,18 +339,18 @@ def run_bot():
             now   = time.time()
             cycle += 1
 
-            # Ã¢ÂÂÃ¢ÂÂ Fetch shared data once Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+            # ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Fetch shared data once ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
             log(f"\n{'='*55}")
-            log(f"Ã°ÂÂÂ Tick #{cycle} Ã¢ÂÂ {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            log(f"ÃÂ°ÃÂÃÂÃÂ Tick #{cycle} ÃÂ¢ÃÂÃÂ {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
             # Refresh macro every hour
             if cycle == 1 or cycle % 12 == 0:
                 try:
-                    log("Ã°ÂÂÂ Refreshing macro data...")
+                    log("ÃÂ°ÃÂÃÂÃÂ Refreshing macro data...")
                     shared_macro = macro_agent.analyze()
-                    log(f"Ã¢ÂÂ Macro: {shared_macro.get('regime','?')}")
+                    log(f"ÃÂ¢ÃÂÃÂ Macro: {shared_macro.get('regime','?')}")
                 except Exception as e:
-                    log(f"Ã¢ÂÂ Ã¯Â¸Â Macro failed: {e}")
+                    log(f"ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ Macro failed: {e}")
                     shared_macro = None
 
             # Fetch news + whales once per tick
@@ -358,31 +358,31 @@ def run_bot():
                 sentiment = get_full_sentiment()
                 news = format_for_ai(sentiment)
             except Exception as e:
-                log(f'Ã¢ÂÂ Ã¯Â¸Â News error: {e}')
+                log(f'ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ News error: {e}')
                 news = 'No news available'
             try:
                 whale_data = {coin: analyze_whales(coin) for coin in COINS}
             except Exception as e:
-                log(f'Ã¢ÂÂ Ã¯Â¸Â Whale error: {e}')
+                log(f'ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ Whale error: {e}')
                 whale_data = {}
 
-            # Ã¢ÂÂÃ¢ÂÂ Scalp: every 5 min Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+            # ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Scalp: every 5 min ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
             if now - last_run["scalp"] >= CYCLE_TIMES["scalp"]:
                 run_style("scalp", scalper.analyze, news, whale_data)
                 last_run["scalp"] = now
 
-            # Ã¢ÂÂÃ¢ÂÂ Day trade: every 1 hour Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+            # ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Day trade: every 1 hour ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
             if now - last_run["day"] >= CYCLE_TIMES["day"]:
                 run_style("day", day_trader.analyze, news, whale_data)
                 last_run["day"] = now
 
-            # Ã¢ÂÂÃ¢ÂÂ Swing: every 4 hours Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+            # ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Swing: every 4 hours ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
             if now - last_run["swing"] >= CYCLE_TIMES["swing"]:
                 run_style("swing", swinger.analyze, news, whale_data)
                 last_run["swing"] = now
 
-            # Ã¢ÂÂÃ¢ÂÂ Daily performance report Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
-                        if cycle % (24 * 12 * 7) == 0 and cycle > 0:   # every 7 days
+            # ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Daily performance report ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+                        if cycle % (24 * 60 * 7) == 0 and cycle > 0:   # every 7 days
                 try:
                     log("Running weekly review...")
                     import subprocess
@@ -390,25 +390,25 @@ def run_bot():
                 except Exception as e:
                     log(f"Weekly review failed: {e}")
 
-            if cycle % (24 * 12) == 0:   # every 24h (12 ticks/hour ÃÂ 24)
+            if cycle % (24 * 60) == 0:   # every 24h (12 ticks/hour ÃÂÃÂ 24)
                 stats = memory.get_stats()
                 send_telegram(
-                    f"Ã°ÂÂÂ <b>Daily Report</b>\n\n"
+                    f"ÃÂ°ÃÂÃÂÃÂ <b>Daily Report</b>\n\n"
                     f"{get_performance_report()}\n\n"
-                    f"Ã°ÂÂ§Â  Patterns: {stats['patterns_discovered']}\n"
+                    f"ÃÂ°ÃÂÃÂ§ÃÂ  Patterns: {stats['patterns_discovered']}\n"
                     f"Win rate: {stats['win_rate']}% | P&L: ${stats['total_pnl']:+,.2f}"
                 )
 
-            log("Ã¢ÂÂ° Next tick in 5 minutes (scalp cycle)...")
+            log("ÃÂ¢ÃÂÃÂ° Next tick in 5 minutes (scalp cycle)...")
             time.sleep(300)   # tick every 5 min (scalp frequency)
 
         except KeyboardInterrupt:
-            log("Ã°ÂÂÂ Bot stopped by user")
-            send_telegram("Ã°ÂÂÂ <b>Multi-Style Bot stopped</b>")
+            log("ÃÂ°ÃÂÃÂÃÂ Bot stopped by user")
+            send_telegram("ÃÂ°ÃÂÃÂÃÂ <b>Multi-Style Bot stopped</b>")
             break
         except Exception as e:
-            log(f"Ã¢ÂÂ Ã¯Â¸Â Main error: {e}")
-            send_telegram(f"Ã¢ÂÂ Ã¯Â¸Â <b>Error</b>\n{e}\nRetrying in 60s...")
+            log(f"ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ Main error: {e}")
+            send_telegram(f"ÃÂ¢ÃÂÃÂ ÃÂ¯ÃÂ¸ÃÂ <b>Error</b>\n{e}\nRetrying in 60s...")
             time.sleep(60)
 
 
