@@ -1,25 +1,27 @@
 """
-ENHANCED NEWS SCRAPER v3 — 100% Free Sources
-All free, no API keys, no accounts needed.
+ENHANCED NEWS SCRAPER v4
+========================
+Free sources - no API keys needed:
 
-Sources:
-1. CoinDesk RSS
-2. CoinTelegraph RSS
-3. Decrypt RSS
-4. Bitcoin Magazine RSS
-5. The Block RSS
-6. Blockworks RSS
-7. Fear & Greed Index
-8. Whale Alert (optional free key)
-9. CoinGecko Trending
-10. Reddit
+1. CoinDesk RSS          - professional crypto news
+2. CoinTelegraph RSS     - breaking news  
+3. Decrypt RSS           - crypto/web3
+4. Bitcoin Magazine RSS  - Bitcoin focused
+5. The Block RSS         - institutional
+6. Blockworks RSS        - crypto finance
+7. Fear & Greed Index    - market mood
+8. CoinGecko Trending    - what's hot
+9. Reddit r/CryptoCurrency - community mood
+10. ForexFactory Calendar - macro events (NEW)
 """
 
 import json
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime
-import os
+from datetime import datetime, timezone, timedelta
+
+
+# ── RSS FEEDS ──────────────────────────────────────────────────────────────────
 
 RSS_FEEDS = [
     ("CoinDesk",         "https://www.coindesk.com/arc/outboundfeeds/rss/"),
@@ -30,181 +32,151 @@ RSS_FEEDS = [
     ("Blockworks",       "https://blockworks.co/feed"),
 ]
 
-BULLISH_WORDS = ["surge","rally","bull","breakout","adoption","buy","gain","rise","pump","ath","record","green","up","bullish","moon","inflow","accumulation","etf","approved","launch","partnership","growth","profit","recovery","rebound","strong","positive"]
-BEARISH_WORDS = ["crash","bear","dump","fear","ban","hack","sell","drop","fall","red","warning","risk","collapse","down","bearish","outflow","liquidation","lawsuit","regulation","crackdown","loss","weak","negative","correction","decline","panic"]
+BULLISH_WORDS = ["surge","rally","bull","soar","gain","rise","adopt","approve","record","high","pump","moon","etf","institutional"]
+BEARISH_WORDS = ["crash","drop","ban","hack","fraud","sell","bear","fall","plunge","fear","dump","liquidat","sec","lawsuit","restrict"]
 
 
-def fetch_rss(url, source_name, limit=5):
+def fetch_rss(url: str, source: str, limit: int = 5) -> list:
     items = []
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "DrissBot/1.0"})
-        with urllib.request.urlopen(req, timeout=10) as r:
-            content = r.read()
-        root    = ET.fromstring(content)
-        channel = root.find("channel") or root
-        for item in list(channel.findall("item"))[:limit]:
+        req = urllib.request.Request(url, headers={"User-Agent": "DrissBot/2.0"})
+        with urllib.request.urlopen(req, timeout=8) as r:
+            root = ET.fromstring(r.read())
+        ch = root.find("channel") or root
+        for item in list(ch.findall("item"))[:limit]:
             title = item.findtext("title", "").strip()
             if title:
-                items.append({"source": source_name, "title": title})
-        print(f"  ✅ {source_name}: {len(items)} articles")
+                items.append({"source": source, "title": title,
+                               "desc": item.findtext("description","")[:150].strip()})
     except Exception as e:
-        print(f"  ⚠️ {source_name}: {e}")
+        print(f"  {source} RSS error: {e}")
     return items
 
 
-def get_fear_greed():
+def get_fear_greed() -> dict:
     try:
-        req = urllib.request.Request("https://api.alternative.me/fng/?limit=7", headers={"User-Agent": "DrissBot/1.0"})
-        with urllib.request.urlopen(req, timeout=5) as r:
+        req = urllib.request.Request(
+            "https://api.alternative.me/fng/?limit=3",
+            headers={"User-Agent": "DrissBot/2.0"}
+        )
+        with urllib.request.urlopen(req, timeout=8) as r:
             data = json.loads(r.read())
-        latest  = data["data"][0]
-        value   = int(latest["value"])
-        label   = latest["value_classification"]
-        history = [int(d["value"]) for d in data["data"]]
-        trend   = "RISING" if history[0] > history[-1] else "FALLING"
-        print(f"  ✅ Fear & Greed: {value}/100 ({label}) {trend}")
-        return {"value": value, "label": label, "trend": trend, "change_7d": history[0]-history[-1]}
+        d = data["data"]
+        current = int(d[0]["value"])
+        prev    = int(d[1]["value"]) if len(d) > 1 else current
+        trend   = "↑ improving" if current > prev else "↓ worsening" if current < prev else "→ stable"
+        return {"value": current, "label": d[0]["value_classification"], "trend": trend}
     except Exception as e:
-        print(f"  ⚠️ Fear & Greed: {e}")
-        return {"value": 50, "label": "Neutral", "trend": "FLAT", "change_7d": 0}
+        print(f"  Fear&Greed error: {e}")
+        return {"value": 50, "label": "Neutral", "trend": "→ stable"}
 
 
-def get_whale_alerts():
-    api_key = os.getenv("WHALE_ALERT_KEY", "")
-    if not api_key:
+def get_coingecko_trending() -> list:
+    try:
+        req = urllib.request.Request(
+            "https://api.coingecko.com/api/v3/search/trending",
+            headers={"User-Agent": "DrissBot/2.0"}
+        )
+        with urllib.request.urlopen(req, timeout=8) as r:
+            data = json.loads(r.read())
+        return [c["item"]["name"] for c in data.get("coins", [])[:5]]
+    except Exception as e:
+        print(f"  CoinGecko error: {e}")
         return []
-    alerts = []
+
+
+def get_forex_factory_events() -> str:
+    """Get today's high-impact macro events from ForexFactory."""
     try:
-        url = f"https://api.whale-alert.io/v1/transactions?api_key={api_key}&min_value=1000000&limit=5"
-        req = urllib.request.Request(url, headers={"User-Agent": "DrissBot/1.0"})
-        with urllib.request.urlopen(req, timeout=5) as r:
-            data = json.loads(r.read())
-        for tx in data.get("transactions", []):
-            symbol = tx.get("symbol","").upper()
-            amt    = tx.get("amount_usd", 0)
-            frm    = tx.get("from",{}).get("owner","unknown")
-            to     = tx.get("to",{}).get("owner","unknown")
-            alerts.append({"symbol":symbol,"amount_usd":amt,"title":f"🐋 ${amt/1e6:.1f}M {symbol}: {frm} → {to}"})
-        print(f"  ✅ Whale Alert: {len(alerts)} txs")
+        req = urllib.request.Request(
+            "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+            headers={"User-Agent": "DrissBot/2.0"}
+        )
+        with urllib.request.urlopen(req, timeout=8) as r:
+            events = json.loads(r.read())
+
+        now    = datetime.now(timezone.utc)
+        cutoff = now + timedelta(hours=8)
+        relevant_currencies = {"USD", "EUR", "GBP", "JPY", "CNY", "All"}
+        high_events = []
+
+        for ev in events:
+            if ev.get("impact") != "High": continue
+            if ev.get("country") not in relevant_currencies: continue
+            try:
+                dt = datetime.fromisoformat(ev["date"].replace("Z","+00:00")).astimezone(timezone.utc)
+                if now - timedelta(hours=1) <= dt <= cutoff:
+                    diff = int((dt - now).total_seconds() / 60)
+                    status = f"in {diff}min" if diff > 0 else f"{abs(diff)}min ago"
+                    high_events.append(f"{ev['title']} ({ev['country']}) — {status} | forecast:{ev.get('forecast','?')} prev:{ev.get('previous','?')}")
+            except: pass
+
+        if high_events:
+            return "⚠️ HIGH-IMPACT EVENTS SOON:\n" + "\n".join(high_events[:4])
+        return "No high-impact events next 8 hours ✅"
     except Exception as e:
-        print(f"  ⚠️ Whale Alert: {e}")
-    return alerts
+        return f"Calendar unavailable: {e}"
 
 
-def get_trending():
-    items = []
-    try:
-        req = urllib.request.Request("https://api.coingecko.com/api/v3/search/trending", headers={"User-Agent": "DrissBot/1.0"})
-        with urllib.request.urlopen(req, timeout=10) as r:
-            data = json.loads(r.read())
-        for c in data.get("coins",[])[:5]:
-            item = c.get("item",{})
-            items.append({"name":item.get("name",""),"symbol":item.get("symbol","").upper(),"title":f"🔥 Trending: {item.get('name','')} ({item.get('symbol','').upper()})"})
-        print(f"  ✅ Trending: {len(items)} coins")
-    except Exception as e:
-        print(f"  ⚠️ Trending: {e}")
-    return items
-
-
-def get_reddit(subreddit, limit=5):
-    items = []
-    try:
-        url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit={limit}"
-        req = urllib.request.Request(url, headers={"User-Agent": "DrissBot/1.0"})
-        with urllib.request.urlopen(req, timeout=10) as r:
-            data = json.loads(r.read())
-        for post in data["data"]["children"]:
-            d = post["data"]
-            items.append({"source":f"r/{subreddit}","title":d["title"],"score":d["score"]})
-        print(f"  ✅ r/{subreddit}: {len(items)} posts")
-    except Exception as e:
-        print(f"  ⚠️ r/{subreddit}: {e}")
-    return items
-
-
-def score_headlines(headlines):
-    bull = sum(1 for h in headlines for w in BULLISH_WORDS if w in h.lower())
-    bear = sum(1 for h in headlines for w in BEARISH_WORDS if w in h.lower())
+def score_headlines(headlines: list) -> dict:
+    bull = 0
+    bear = 0
+    for h in headlines:
+        text = h["title"].lower()
+        bull += sum(1 for w in BULLISH_WORDS if w in text)
+        bear += sum(1 for w in BEARISH_WORDS if w in text)
     total = bull + bear
-    return round((bull-bear)/total if total > 0 else 0, 3), bull, bear
+    if total == 0:
+        sentiment = "NEUTRAL"
+        score = 0
+    else:
+        score = int((bull - bear) / total * 10)
+        if score >= 3:   sentiment = "BULLISH"
+        elif score >= 1: sentiment = "SLIGHTLY BULLISH"
+        elif score <= -3:sentiment = "BEARISH"
+        elif score <= -1:sentiment = "SLIGHTLY BEARISH"
+        else:            sentiment = "NEUTRAL"
+    return {"sentiment": sentiment, "score": score, "bullish_signals": bull, "bearish_signals": bear}
 
 
-def get_full_sentiment(coins=None):
-    if coins is None:
-        coins = ["BTC","ETH","SOL","BNB"]
-
-    print("\n📰 Fetching full market sentiment...")
-
-    fear_greed = get_fear_greed()
-    trending   = get_trending()
-    whales     = get_whale_alerts()
-    reddit_btc = get_reddit("Bitcoin", 5)
-    reddit_cc  = get_reddit("CryptoCurrency", 5)
-
-    all_rss = []
-    for source_name, url in RSS_FEEDS:
-        all_rss.extend(fetch_rss(url, source_name, 4))
-
+def get_full_sentiment() -> dict:
     headlines = []
-    for item in all_rss:
-        headlines.append(f"[{item['source']}] {item['title']}")
-    for item in reddit_btc + reddit_cc:
-        headlines.append(f"[{item['source']} ⬆{item.get('score',0)}] {item['title']}")
-    for item in whales:
-        headlines.append(f"[WHALE] {item['title']}")
-    for item in trending:
-        headlines.append(f"[TRENDING] {item['title']}")
+    for source, url in RSS_FEEDS:
+        headlines.extend(fetch_rss(url, source))
 
-    score, bull, bear = score_headlines(headlines)
-
-    print(f"\n  📊 Sentiment: {score:+.3f} (🟢{bull} bull / 🔴{bear} bear)")
-    print(f"  📰 {len(headlines)} total signals")
+    fg          = get_fear_greed()
+    trending    = get_coingecko_trending()
+    macro       = get_forex_factory_events()
+    news_scores = score_headlines(headlines)
 
     return {
-        "timestamp"      : datetime.now().isoformat(),
-        "fear_greed"     : fear_greed,
-        "headlines"      : headlines[:25],
-        "whale_alerts"   : whales,
-        "trending"       : trending,
-        "sentiment_score": score,
-        "bull_count"     : bull,
-        "bear_count"     : bear,
+        "headlines"   : headlines[:20],
+        "fear_greed"  : fg,
+        "trending"    : trending,
+        "macro_events": macro,
+        "news_scores" : news_scores,
     }
 
 
-def format_for_ai(sentiment, coin="BTC"):
-    fg = sentiment["fear_greed"]
+def format_for_ai(data: dict) -> str:
+    fg     = data.get("fear_greed", {})
+    scores = data.get("news_scores", {})
+    macro  = data.get("macro_events", "")
+
     lines = [
-        f"📰 SENTIMENT — {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-        f"",
-        f"😱 Fear & Greed: {fg['value']}/100 ({fg['label']}) | Trend: {fg['trend']} | 7d: {fg['change_7d']:+d}",
-        f"📊 Score: {sentiment['sentiment_score']:+.3f} (🟢{sentiment['bull_count']} / 🔴{sentiment['bear_count']})",
-        f"",
+        f"MARKET MOOD: Fear & Greed = {fg.get('value',50)}/100 ({fg.get('label','?')}) {fg.get('trend','')}",
+        f"NEWS SENTIMENT: {scores.get('sentiment','?')} (score:{scores.get('score',0):+d} | bull:{scores.get('bullish_signals',0)} bear:{scores.get('bearish_signals',0)})",
+        "",
+        f"MACRO CALENDAR: {macro}",
+        "",
+        "TOP HEADLINES:",
     ]
-    if sentiment["whale_alerts"]:
-        lines.append("🐋 WHALE MOVEMENTS:")
-        for w in sentiment["whale_alerts"]:
-            lines.append(f"  • {w['title']}")
-        lines.append("")
-    if sentiment["trending"]:
-        lines.append("🔥 TRENDING:")
-        for t in sentiment["trending"][:3]:
-            lines.append(f"  • {t['title']}")
-        lines.append("")
-    lines.append("🗞️ TOP HEADLINES:")
-    for h in sentiment["headlines"][:15]:
-        lines.append(f"  • {h}")
+
+    for h in data.get("headlines", [])[:8]:
+        lines.append(f"  [{h['source']}] {h['title']}")
+
+    trending = data.get("trending", [])
+    if trending:
+        lines.append(f"\nTRENDING COINS: {', '.join(trending)}")
+
     return "\n".join(lines)
-
-
-# Legacy compatibility
-def get_latest_news():
-    sentiment = get_full_sentiment()
-    return format_for_ai(sentiment)
-
-
-if __name__ == "__main__":
-    sentiment = get_full_sentiment()
-    print("\n" + "="*60)
-    print(format_for_ai(sentiment))
-    print("="*60)
