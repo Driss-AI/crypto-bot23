@@ -1,5 +1,5 @@
 """
-Dashboard Server — Clean Version
+Dashboard Server  Clean Version
 Uses CoinGecko for prices (free, no account needed).
 """
 
@@ -179,7 +179,7 @@ tr:last-child td{border-bottom:none}
 <div class="container">
 <div class="header">
   <div class="logo">DRISS<span>BOT</span> <span style="font-size:14px;color:var(--muted);font-weight:400">TRADING SYSTEM</span></div>
-  <div class="live-badge"><div class="live-dot"></div>LIVE · AUTO-REFRESH 30S</div>
+  <div class="live-badge"><div class="live-dot"></div>LIVE  AUTO-REFRESH 30S</div>
 </div>
 <div class="stats-grid">
   <div class="stat-card"><div class="stat-label">Capital</div><div class="stat-value {% if stats.total_pnl >= 0 %}green{% else %}red{% endif %}">${{ "{:,.0f}".format(stats.capital) }}</div></div>
@@ -193,13 +193,13 @@ tr:last-child td{border-bottom:none}
   <div class="price-card">
     <div class="price-coin">{{ symbol.replace('/USDT','') }} / USDT</div>
     <div class="price-value">{% if data.price %}${{ "{:,.2f}".format(data.price) }}{% else %}Loading...{% endif %}</div>
-    <div class="price-change {% if data.change >= 0 %}up{% else %}down{% endif %}">{{ "▲" if data.change >= 0 else "▼" }} {{ "{:.2f}".format(data.change|abs) }}% 24h</div>
+    <div class="price-change {% if data.change >= 0 %}up{% else %}down{% endif %}">{{ "" if data.change >= 0 else "" }} {{ "{:.2f}".format(data.change|abs) }}% 24h</div>
   </div>
   {% endfor %}
 </div>
 <div class="main-grid">
   <div class="card">
-    <div class="card-title">⚡ Open Trades</div>
+    <div class="card-title"> Open Trades</div>
     {% if stats.open_trades %}
     <table>
       <tr><th>Action</th><th>Entry</th><th>Stop</th><th>Target</th><th>Size</th><th>Time</th></tr>
@@ -218,7 +218,7 @@ tr:last-child td{border-bottom:none}
   </div>
   <div style="display:flex;flex-direction:column;gap:12px">
     <div class="card">
-      <div class="card-title">😱 Fear & Greed Index</div>
+      <div class="card-title"> Fear & Greed Index</div>
       <div style="display:flex;justify-content:space-between;align-items:baseline">
         <div style="font-family:'Syne',sans-serif;font-size:42px;font-weight:800">{{ fg_value }}</div>
         <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:2px">{{ fg_label }}</div>
@@ -227,7 +227,7 @@ tr:last-child td{border-bottom:none}
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);letter-spacing:1px"><span>EXTREME FEAR</span><span>NEUTRAL</span><span>EXTREME GREED</span></div>
     </div>
     <div class="card">
-      <div class="card-title">🧠 Agent Credibility</div>
+      <div class="card-title"> Agent Credibility</div>
       {% if stats.creds %}
         {% for cred in stats.creds %}
         <div class="cred-bar">
@@ -242,7 +242,7 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
   <div class="card full-width">
-    <div class="card-title">📋 Recent Closed Trades</div>
+    <div class="card-title"> Recent Closed Trades</div>
     {% if stats.recent_closed %}
     <table>
       <tr><th>Action</th><th>Entry</th><th>Exit</th><th>P&L</th><th>Result</th><th>Date</th></tr>
@@ -250,17 +250,17 @@ tr:last-child td{border-bottom:none}
       <tr>
         <td><span class="badge {{ t[0].lower() }}">{{ t[0] }}</span></td>
         <td>${{ "{:,.2f}".format(t[1]) }}</td>
-        <td>${{ "{:,.2f}".format(t[2]) if t[2] else "—" }}</td>
-        <td class="{% if t[3] and t[3]>=0 %}ppos{% else %}pneg{% endif %}">{{ "+" if t[3] and t[3]>=0 else "" }}${{ "{:.2f}".format(t[3]) if t[3] else "—" }}</td>
-        <td style="font-size:11px">{{ t[4] or "—" }}</td>
-        <td style="color:var(--muted);font-size:10px">{{ t[5][:10] if t[5] else "—" }}</td>
+        <td>${{ "{:,.2f}".format(t[2]) if t[2] else "" }}</td>
+        <td class="{% if t[3] and t[3]>=0 %}ppos{% else %}pneg{% endif %}">{{ "+" if t[3] and t[3]>=0 else "" }}${{ "{:.2f}".format(t[3]) if t[3] else "" }}</td>
+        <td style="font-size:11px">{{ t[4] or "" }}</td>
+        <td style="color:var(--muted);font-size:10px">{{ t[5][:10] if t[5] else "" }}</td>
       </tr>
       {% endfor %}
     </table>
     {% else %}<div class="empty">NO CLOSED TRADES YET</div>{% endif %}
   </div>
 </div>
-<div class="ts">LAST UPDATED: {{ now }} · DRISSBOT MULTI-AGENT SYSTEM</div>
+<div class="ts">LAST UPDATED: {{ now }}  DRISSBOT MULTI-AGENT SYSTEM</div>
 </div>
 </body>
 </html>"""

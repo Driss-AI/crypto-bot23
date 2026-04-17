@@ -1,6 +1,6 @@
 """
 SWING TRADER AGENT
-═══════════════════════════════════════════════════
+
 Timeframe : 4h + 1d confirmation
 Stop Loss : 8%
 Take Profit: 16%
@@ -31,12 +31,12 @@ class SwingAgent:
     def __init__(self):
         self.name  = "swing"
         self.style = "swing"
-        print("🌊 Swing Agent initialized")
+        print(" Swing Agent initialized")
 
     def get_data(self, symbol: str) -> dict:
-        # 4h candles — main timeframe
+        # 4h candles  main timeframe
         c4h = exchange.fetch_ohlcv(symbol, "4h", limit=100)
-        # 1d candles — trend confirmation
+        # 1d candles  trend confirmation
         c1d = exchange.fetch_ohlcv(symbol, "1d", limit=50)
 
         df4h = pd.DataFrame(c4h, columns=["ts","open","high","low","close","volume"])
@@ -64,7 +64,7 @@ class SwingAgent:
         r4h = df4h.iloc[-1]
         r1d = df1d.iloc[-1]
 
-        # RSI divergence — compare current vs 10 candles ago
+        # RSI divergence  compare current vs 10 candles ago
         rsi_prev = float(df4h["rsi"].iloc[-10]) if len(df4h) > 10 else float(r4h["rsi"])
         price_prev = float(df4h["close"].iloc[-10]) if len(df4h) > 10 else float(r4h["close"])
 
@@ -90,11 +90,11 @@ class SwingAgent:
         }
 
     def analyze(self, symbol: str) -> dict:
-        print(f"  🌊 Swing analyzing {symbol}...")
+        print(f"   Swing analyzing {symbol}...")
         try:
             data = self.get_data(symbol)
         except Exception as e:
-            print(f"  ⚠️ Swing data error: {e}")
+            print(f"   Swing data error: {e}")
             return self._empty(symbol)
 
         price    = data["price"]
@@ -112,10 +112,10 @@ class SwingAgent:
         # 1D trend is king for swing trading
         if trend_1d == "BULLISH":
             score += 2
-            reasons.append("1D trend BULLISH ✅ (EMA50 > EMA200)")
+            reasons.append("1D trend BULLISH  (EMA50 > EMA200)")
         else:
             score -= 2
-            reasons.append("1D trend BEARISH ⚠️ (EMA50 < EMA200)")
+            reasons.append("1D trend BEARISH  (EMA50 < EMA200)")
 
         # 4H trend confirmation
         if trend_4h == "BULLISH":
@@ -125,31 +125,31 @@ class SwingAgent:
             score -= 1
             reasons.append("4H trend BEARISH")
 
-        # RSI on 4h — wider zones for swing
+        # RSI on 4h  wider zones for swing
         if rsi_4h < 35:
             score += 2
-            reasons.append(f"4H RSI {rsi_4h:.1f} — oversold")
+            reasons.append(f"4H RSI {rsi_4h:.1f}  oversold")
         elif rsi_4h > 65:
             score -= 2
-            reasons.append(f"4H RSI {rsi_4h:.1f} — overbought")
+            reasons.append(f"4H RSI {rsi_4h:.1f}  overbought")
 
         # Daily RSI extreme
         if rsi_1d < 30:
             score += 2
-            reasons.append(f"1D RSI {rsi_1d:.1f} — major oversold 🔥")
+            reasons.append(f"1D RSI {rsi_1d:.1f}  major oversold ")
         elif rsi_1d > 70:
             score -= 2
-            reasons.append(f"1D RSI {rsi_1d:.1f} — major overbought")
+            reasons.append(f"1D RSI {rsi_1d:.1f}  major overbought")
 
         # RSI divergence (price up but RSI down = bearish divergence)
         price_change = (price - data["price_prev"]) / data["price_prev"]
         rsi_change   = rsi_4h - data["rsi_prev"]
         if price_change > 0.02 and rsi_change < -5:
             score -= 2
-            reasons.append("Bearish RSI divergence ⚠️")
+            reasons.append("Bearish RSI divergence ")
         elif price_change < -0.02 and rsi_change > 5:
             score += 2
-            reasons.append("Bullish RSI divergence 💡")
+            reasons.append("Bullish RSI divergence ")
 
         # MACD on 4h
         if macd > macd_sig:
@@ -167,7 +167,7 @@ class SwingAgent:
             score -= 1
             reasons.append("4H price above upper BB")
 
-        # Convert — swing needs stronger signal (higher threshold)
+        # Convert  swing needs stronger signal (higher threshold)
         if score >= 5:
             signal, confidence = "BUY", "high"
         elif score >= 3:
@@ -179,7 +179,7 @@ class SwingAgent:
         else:
             signal, confidence = "HOLD", "low"
 
-        print(f"    → {signal} ({confidence}) | score: {score:+d}")
+        print(f"     {signal} ({confidence}) | score: {score:+d}")
         return {
             "agent"      : self.name,
             "style"      : self.style,

@@ -9,7 +9,7 @@ import os
 import time
 import requests
 
-# ── SETUP ────────────────────────────────────────────────
+#  SETUP 
 load_dotenv()
 api_key          = os.getenv("ANTHROPIC_API_KEY")
 TELEGRAM_TOKEN   = os.getenv("TELEGRAM_TOKEN")
@@ -21,7 +21,7 @@ rm       = RiskManager(total_capital=1000)
 
 LOG_FILE = "bot_log.txt"
 
-# ── TELEGRAM ─────────────────────────────────────────────
+#  TELEGRAM 
 def send_telegram(message):
     try:
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -30,11 +30,11 @@ def send_telegram(message):
             "text"       : message,
             "parse_mode" : "HTML"
         })
-        print("📱 Telegram alert sent!")
+        print(" Telegram alert sent!")
     except Exception as e:
-        print(f"⚠️ Telegram error: {e}")
+        print(f" Telegram error: {e}")
 
-# ── LOGGING ──────────────────────────────────────────────
+#  LOGGING 
 def log(message):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     line = f"[{timestamp}] {message}"
@@ -42,9 +42,9 @@ def log(message):
     with open(LOG_FILE, "a") as f:
         f.write(line + "\n")
 
-# ── STEP 1: FETCH MARKET DATA ────────────────────────────
+#  STEP 1: FETCH MARKET DATA 
 def get_market_data():
-    log("📡 Fetching market data from Binance...")
+    log(" Fetching market data from Binance...")
     candles = exchange.fetch_ohlcv("BTC/USDT", timeframe="1h", limit=100)
     df = pd.DataFrame(candles, columns=["timestamp","open","high","low","close","volume"])
 
@@ -71,9 +71,9 @@ def get_market_data():
         "vol_avg"  : latest["volume_avg"],
     }
 
-# ── STEP 2: ASK CLAUDE ───────────────────────────────────
+#  STEP 2: ASK CLAUDE 
 def ask_claude(data):
-    log("🧠 Asking Claude AI for analysis...")
+    log(" Asking Claude AI for analysis...")
 
     prompt = f"""
 You are an expert crypto trading analyst. Analyze this Bitcoin market data and respond in this EXACT format:
@@ -118,61 +118,61 @@ Be decisive. Give a clear action.
 
     return action, confidence, reasoning, risks
 
-# ── STEP 3: PAPER TRADE + TELEGRAM ───────────────────────
+#  STEP 3: PAPER TRADE + TELEGRAM 
 def paper_trade(action, confidence, reasoning, risks, data):
     price    = data["price"]
     approved, reason, details = rm.check_trade(action, price, confidence)
 
     # Build Telegram message
-    action_emoji = "🟢" if action == "BUY" else "🔴" if action == "SELL" else "🟡"
-    conf_emoji   = "💪" if confidence == "high" else "👍" if confidence == "medium" else "🤔"
+    action_emoji = "" if action == "BUY" else "" if action == "SELL" else ""
+    conf_emoji   = "" if confidence == "high" else "" if confidence == "medium" else ""
 
     msg = f"""
-🤖 <b>Crypto Bot — BTC Analysis</b>
-🕐 {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}
+ <b>Crypto Bot  BTC Analysis</b>
+ {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}
 
-💰 <b>Price:</b> ${price:,.2f}
-📊 RSI: {data['rsi']:.1f} | MACD: {'Bullish 📈' if data['macd'] > data['macd_sig'] else 'Bearish 📉'}
+ <b>Price:</b> ${price:,.2f}
+ RSI: {data['rsi']:.1f} | MACD: {'Bullish ' if data['macd'] > data['macd_sig'] else 'Bearish '}
 
 {action_emoji} <b>Decision: {action}</b>
 {conf_emoji} Confidence: {confidence.upper()}
 
-🧠 <b>Reasoning:</b>
+ <b>Reasoning:</b>
 {reasoning}
 
-⚠️ <b>Risks:</b>
+ <b>Risks:</b>
 {risks}
 """
 
     if approved:
         msg += f"""
-✅ <b>PAPER TRADE PLACED:</b>
+ <b>PAPER TRADE PLACED:</b>
 - Size: ${details['position_size_usd']}
 - Stop loss: ${details['stop_loss']:,}
 - Take profit: ${details['take_profit']:,}
 - Max loss: ${details['max_loss_usd']}
 - Max gain: ${details['max_gain_usd']}
 """
-        log(f"📝 Paper trade: {action} ${details['position_size_usd']} @ ${price:,}")
+        log(f" Paper trade: {action} ${details['position_size_usd']} @ ${price:,}")
     else:
-        msg += f"\n⏸️ <b>No trade placed</b> — {reason}"
-        log(f"⏸️ No trade: {reason}")
+        msg += f"\n <b>No trade placed</b>  {reason}"
+        log(f" No trade: {reason}")
 
     send_telegram(msg)
 
-# ── MAIN LOOP ─────────────────────────────────────────────
+#  MAIN LOOP 
 def run_bot():
     log("="*50)
-    log("🚀 CRYPTO BOT STARTING — PAPER TRADING MODE")
+    log(" CRYPTO BOT STARTING  PAPER TRADING MODE")
     log("="*50)
 
     send_telegram("""
-🚀 <b>Crypto Bot Started!</b>
+ <b>Crypto Bot Started!</b>
 
-📊 Watching BTC/USDT 24/7
-⏰ Analysis every 1 hour
-🛡️ Risk management active
-📝 Paper trading mode
+ Watching BTC/USDT 24/7
+ Analysis every 1 hour
+ Risk management active
+ Paper trading mode
 
 <i>You'll get an alert after every analysis!</i>
 """)
@@ -180,23 +180,23 @@ def run_bot():
     while True:
         try:
             log("\n" + "-"*50)
-            log("🔄 New analysis cycle starting...")
+            log(" New analysis cycle starting...")
 
             data = get_market_data()
-            log(f"💰 BTC: ${data['price']:,.2f} | RSI: {data['rsi']:.1f}")
+            log(f" BTC: ${data['price']:,.2f} | RSI: {data['rsi']:.1f}")
 
             action, confidence, reasoning, risks = ask_claude(data)
-            log(f"🤖 Claude: {action} ({confidence})")
+            log(f" Claude: {action} ({confidence})")
 
             paper_trade(action, confidence, reasoning, risks, data)
 
-            log(f"⏰ Next analysis in 1 hour...")
+            log(f" Next analysis in 1 hour...")
             time.sleep(3600)
 
         except Exception as e:
-            error_msg = f"⚠️ Bot error: {e}"
+            error_msg = f" Bot error: {e}"
             log(error_msg)
-            send_telegram(f"⚠️ <b>Bot Error</b>\n{e}\nRetrying in 60 seconds...")
+            send_telegram(f" <b>Bot Error</b>\n{e}\nRetrying in 60 seconds...")
             time.sleep(60)
 
 if __name__ == "__main__":

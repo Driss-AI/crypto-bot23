@@ -25,14 +25,14 @@ exchange = ccxt.binance()
 STOP_LOSS_PCT   = 0.004   # 0.4%
 TAKE_PROFIT_PCT = 0.008   # 0.8% - tight but realistic for 1m scalp
 POSITION_SIZE   = 0.05    # 5% of capital
-CYCLE_SECONDS   = 60      # Ã¢ÂÂ 1 minute cycles
+CYCLE_SECONDS   = 60      #  1 minute cycles
 
 
 class ScalperAgent:
     def __init__(self):
         self.name  = "scalper"
         self.style = "scalp"
-        print("Ã°ÂÂÂ¥ Scalper Agent initialized Ã¢ÂÂ 1min cycles")
+        print(" Scalper Agent initialized  1min cycles")
 
     def get_data(self, symbol: str) -> dict:
         # 1m candles for entry signal
@@ -43,7 +43,7 @@ class ScalperAgent:
         df1 = pd.DataFrame(c1,  columns=["ts","open","high","low","close","volume"])
         df5 = pd.DataFrame(c5,  columns=["ts","open","high","low","close","volume"])
 
-        # Ã¢ÂÂÃ¢ÂÂ 1m indicators Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+        #  1m indicators 
         df1["rsi"]     = ta.rsi(df1["close"], length=9)   # faster RSI for 1m
         macd1          = ta.macd(df1["close"], fast=8, slow=17, signal=9)
         df1["macd"]    = macd1.iloc[:, 0].fillna(0)
@@ -53,12 +53,12 @@ class ScalperAgent:
         df1["bb_lower"]= bb1.iloc[:, 0].fillna(df1["close"])
         df1["bb_upper"]= bb1.iloc[:, 2].fillna(df1["close"])
 
-        # Ã¢ÂÂÃ¢ÂÂ 5m trend filter Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+        #  5m trend filter 
         df5["ema20"] = ta.ema(df5["close"], length=20)
         df5["ema50"] = ta.ema(df5["close"], length=50)
         df5["rsi"]   = ta.rsi(df5["close"], length=14)
 
-        last1  = df1.iloc[-2]   # Ã¢ÂÂ CLOSED candle (not current)
+        last1  = df1.iloc[-2]   #  CLOSED candle (not current)
         last5  = df5.iloc[-1]
         price  = float(df1["close"].iloc[-1])
 
@@ -90,7 +90,7 @@ class ScalperAgent:
         try:
             d = self.get_data(symbol)
         except Exception as e:
-            print(f"Ã¢ÂÂ Ã¯Â¸Â Scalper data error {symbol}: {e}")
+            print(f" Scalper data error {symbol}: {e}")
             return None
 
         price      = d["price"]
@@ -101,19 +101,19 @@ class ScalperAgent:
         score      = 0
         reasons    = []
 
-        # Ã¢ÂÂÃ¢ÂÂ GATE 1: Volume must confirm (2x average) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+        #  GATE 1: Volume must confirm (2x average) 
         if vol_ratio < 1.8:
             return {
                 "signal"   : "HOLD",
                 "score"    : 0,
-                "reasoning": f"Low volume ({vol_ratio:.1f}x) Ã¢ÂÂ no scalp",
+                "reasoning": f"Low volume ({vol_ratio:.1f}x)  no scalp",
                 "sl_pct"   : STOP_LOSS_PCT,
                 "tp_pct"   : TAKE_PROFIT_PCT,
                 "size_pct" : POSITION_SIZE,
                 "raw_data" : {"price": price, "rsi": rsi},
             }
 
-        # Ã¢ÂÂÃ¢ÂÂ GATE 2: Only trade with 5m trend Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+        #  GATE 2: Only trade with 5m trend 
         with_trend_up   = d["trend_up"]   and d["candle_bullish"]
         with_trend_down = d["trend_down"] and d["candle_bearish"]
 
@@ -121,14 +121,14 @@ class ScalperAgent:
             return {
                 "signal"   : "HOLD",
                 "score"    : 0,
-                "reasoning": "Against 5m trend Ã¢ÂÂ skip",
+                "reasoning": "Against 5m trend  skip",
                 "sl_pct"   : STOP_LOSS_PCT,
                 "tp_pct"   : TAKE_PROFIT_PCT,
                 "size_pct" : POSITION_SIZE,
                 "raw_data" : {"price": price, "rsi": rsi},
             }
 
-        # Ã¢ÂÂÃ¢ÂÂ RSI signal Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+        #  RSI signal 
         if rsi < 30:
             score += 3; reasons.append(f"RSI {rsi:.0f} oversold")
         elif rsi < 40:
@@ -138,25 +138,25 @@ class ScalperAgent:
         elif rsi > 60:
             score -= 1; reasons.append(f"RSI {rsi:.0f} leaning overbought")
 
-        # Ã¢ÂÂÃ¢ÂÂ MACD crossover Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+        #  MACD crossover 
         if macd > macd_sig:
             score += 2; reasons.append("MACD bullish cross")
         else:
             score -= 2; reasons.append("MACD bearish cross")
 
-        # Ã¢ÂÂÃ¢ÂÂ BB extremes Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+        #  BB extremes 
         if price <= d["bb_lower"]:
-            score += 2; reasons.append("At lower BB Ã¢ÂÂ bounce setup")
+            score += 2; reasons.append("At lower BB  bounce setup")
         elif price >= d["bb_upper"]:
-            score -= 2; reasons.append("At upper BB Ã¢ÂÂ rejection setup")
+            score -= 2; reasons.append("At upper BB  rejection setup")
 
-        # Ã¢ÂÂÃ¢ÂÂ Volume boost Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+        #  Volume boost 
         if vol_ratio > 3:
             score = int(score * 1.5); reasons.append(f"HUGE volume {vol_ratio:.1f}x")
         elif vol_ratio > 2:
             score = int(score * 1.2); reasons.append(f"Strong volume {vol_ratio:.1f}x")
 
-        # Ã¢ÂÂÃ¢ÂÂ Final signal Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+        #  Final signal 
         if score >= 3:
             signal = "BUY"
         elif score <= -3:

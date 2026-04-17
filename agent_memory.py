@@ -1,5 +1,5 @@
 """
-Agent Memory — PostgreSQL version
+Agent Memory  PostgreSQL version
 Survives Railway reboots, redeploys, crashes.
 Falls back to SQLite if DATABASE_URL not set.
 """
@@ -18,12 +18,12 @@ if DATABASE_URL:
     import psycopg2
     import psycopg2.extras
     USE_PG = True
-    print("🐘 AgentMemory using PostgreSQL")
+    print(" AgentMemory using PostgreSQL")
 else:
     import sqlite3
     USE_PG = False
     DB_PATH = "memory/trades.db"
-    print("📁 AgentMemory using SQLite (no DATABASE_URL found)")
+    print(" AgentMemory using SQLite (no DATABASE_URL found)")
 
 
 def get_conn():
@@ -49,7 +49,7 @@ def ph():
 class AgentMemory:
     def __init__(self):
         self._init_database()
-        print("🧠 AgentMemory loaded — database connected")
+        print(" AgentMemory loaded  database connected")
 
     def _init_database(self):
         conn = get_conn()
@@ -188,7 +188,7 @@ class AgentMemory:
         trade_id = c.fetchone()[0]
         conn.commit()
         conn.close()
-        print(f"📈 Trade #{trade_id} recorded: {action} {symbol} @ ${price:,.2f}")
+        print(f" Trade #{trade_id} recorded: {action} {symbol} @ ${price:,.2f}")
         return trade_id
 
     def record_trade_exit(self, trade_id, exit_price):
@@ -333,7 +333,7 @@ class AgentMemory:
         stats = self.get_stats()
         creds = self.get_agent_credibility()
         print("\n" + "="*50)
-        print("  🧠 BOT MEMORY STATS")
+        print("   BOT MEMORY STATS")
         print("="*50)
         print(f"  Total trades:     {stats['total_trades']}")
         print(f"  Win rate:         {stats['win_rate']}%")
@@ -342,6 +342,6 @@ class AgentMemory:
         print(f"  Patterns learned: {stats['patterns_discovered']}")
         print("\n  Agent Credibility:")
         for agent, data in creds.items():
-            bar = "█" * int(data['score'] * 10)
+            bar = "" * int(data['score'] * 10)
             print(f"  {agent:<12} {bar:<10} {data['score']:.2f} ({data['total_calls']} calls)")
         print("="*50 + "\n")

@@ -16,7 +16,7 @@ class MacroAgent:
 
     def __init__(self):
         self.name = "macro"
-        print("🌍 Macro Agent initialized")
+        print(" Macro Agent initialized")
 
     def _fetch_url(self, url):
         """Simple URL fetcher with error handling"""
@@ -28,7 +28,7 @@ class MacroAgent:
             with urllib.request.urlopen(req, timeout=10) as r:
                 return json.loads(r.read())
         except Exception as e:
-            print(f"⚠️ Fetch error: {e}")
+            print(f" Fetch error: {e}")
             return None
 
     def get_fear_greed(self):
@@ -51,19 +51,19 @@ class MacroAgent:
 
         if value <= 25:
             signal = "STRONG_BUY"
-            reasoning = f"Extreme Fear ({value}/100) — historically strong buy zone"
+            reasoning = f"Extreme Fear ({value}/100)  historically strong buy zone"
         elif value <= 40:
             signal = "BUY"
-            reasoning = f"Fear ({value}/100) — market overselling, opportunity"
+            reasoning = f"Fear ({value}/100)  market overselling, opportunity"
         elif value <= 60:
             signal = "NEUTRAL"
-            reasoning = f"Neutral ({value}/100) — no strong sentiment edge"
+            reasoning = f"Neutral ({value}/100)  no strong sentiment edge"
         elif value <= 75:
             signal = "CAUTION"
-            reasoning = f"Greed ({value}/100) — market getting excited, be careful"
+            reasoning = f"Greed ({value}/100)  market getting excited, be careful"
         else:
             signal = "STRONG_SELL"
-            reasoning = f"Extreme Greed ({value}/100) — historically dangerous zone"
+            reasoning = f"Extreme Greed ({value}/100)  historically dangerous zone"
 
         return {
             "value": value,
@@ -75,7 +75,7 @@ class MacroAgent:
 
     def get_bitcoin_dominance(self):
         """
-        Bitcoin dominance — BTC % of total crypto market
+        Bitcoin dominance  BTC % of total crypto market
         Rising dominance = money flowing INTO BTC (good for BTC)
         Falling dominance = money flowing to altcoins (alt season)
         """
@@ -91,13 +91,13 @@ class MacroAgent:
 
         if dominance > 55:
             signal = "BTC_STRONG"
-            reasoning = f"BTC dominance high ({dominance:.1f}%) — capital flowing to BTC"
+            reasoning = f"BTC dominance high ({dominance:.1f}%)  capital flowing to BTC"
         elif dominance > 45:
             signal = "NEUTRAL"
             reasoning = f"BTC dominance neutral ({dominance:.1f}%)"
         else:
             signal = "ALT_SEASON"
-            reasoning = f"BTC dominance low ({dominance:.1f}%) — alt season possible"
+            reasoning = f"BTC dominance low ({dominance:.1f}%)  alt season possible"
 
         return {
             "btc_dominance": round(dominance, 2),
@@ -135,19 +135,19 @@ class MacroAgent:
         # Combine signals
         if price_change > 5 and volume_trend > 10:
             signal = "STRONG_INFLOW"
-            reasoning = f"Price +{price_change:.1f}% with volume surge — institutional buying likely"
+            reasoning = f"Price +{price_change:.1f}% with volume surge  institutional buying likely"
         elif price_change > 2:
             signal = "MILD_INFLOW"
-            reasoning = f"Price +{price_change:.1f}% — steady accumulation"
+            reasoning = f"Price +{price_change:.1f}%  steady accumulation"
         elif price_change < -5 and volume_trend > 10:
             signal = "STRONG_OUTFLOW"
-            reasoning = f"Price {price_change:.1f}% with high volume — selling pressure"
+            reasoning = f"Price {price_change:.1f}% with high volume  selling pressure"
         elif price_change < -2:
             signal = "MILD_OUTFLOW"
-            reasoning = f"Price {price_change:.1f}% — mild distribution"
+            reasoning = f"Price {price_change:.1f}%  mild distribution"
         else:
             signal = "NEUTRAL"
-            reasoning = f"Price {price_change:.1f}% — sideways, no clear flow"
+            reasoning = f"Price {price_change:.1f}%  sideways, no clear flow"
 
         return {
             "price_change_7d": round(price_change, 2),
@@ -217,7 +217,7 @@ class MacroAgent:
         Run full macro analysis.
         Returns structured output for the Orchestrator.
         """
-        print("🌍 Running Macro Agent analysis...")
+        print(" Running Macro Agent analysis...")
 
         # Gather all data
         fear_greed    = self.get_fear_greed()
@@ -231,30 +231,30 @@ class MacroAgent:
 
         # Print snapshot
         print("\n" + "="*55)
-        print("  🌍 MACRO AGENT REPORT")
+        print("   MACRO AGENT REPORT")
         print("="*55)
 
         if fear_greed:
-            print(f"\n  😱 Fear & Greed:    {fear_greed['value']}/100 "
-                  f"({fear_greed['label']}) — trend {fear_greed['trend']}")
+            print(f"\n   Fear & Greed:    {fear_greed['value']}/100 "
+                  f"({fear_greed['label']})  trend {fear_greed['trend']}")
             print(f"     Signal: {fear_greed['signal']}")
-            print(f"     → {fear_greed['reasoning']}")
+            print(f"      {fear_greed['reasoning']}")
 
         if btc_dominance:
-            print(f"\n  👑 BTC Dominance:   {btc_dominance['btc_dominance']}%")
+            print(f"\n   BTC Dominance:   {btc_dominance['btc_dominance']}%")
             print(f"     Market 24h:     {btc_dominance['market_change_24h']:+.2f}%")
             print(f"     Signal: {btc_dominance['signal']}")
-            print(f"     → {btc_dominance['reasoning']}")
+            print(f"      {btc_dominance['reasoning']}")
 
         if etf_signal:
-            print(f"\n  🏦 ETF/Flow Signal: {etf_signal['signal']}")
+            print(f"\n   ETF/Flow Signal: {etf_signal['signal']}")
             print(f"     7d price change: {etf_signal['price_change_7d']:+.2f}%")
             print(f"     Volume trend:    {etf_signal['volume_trend']:+.2f}%")
-            print(f"     → {etf_signal['reasoning']}")
+            print(f"      {etf_signal['reasoning']}")
 
         print(f"\n  {'='*53}")
-        emoji = "🟢" if regime['overall'] == "BULLISH" else \
-                "🔴" if regime['overall'] == "BEARISH" else "🟡"
+        emoji = "" if regime['overall'] == "BULLISH" else \
+                "" if regime['overall'] == "BEARISH" else ""
         print(f"  {emoji} MACRO REGIME: {regime['regime']}")
         print(f"     Overall:  {regime['overall']}")
         print(f"     Score:    {regime['score']:+d}")
@@ -272,7 +272,7 @@ class MacroAgent:
         }
 
 
-# ── RUN STANDALONE ───────────────────────────────────────
+#  RUN STANDALONE 
 if __name__ == "__main__":
     agent = MacroAgent()
     result = agent.analyze()

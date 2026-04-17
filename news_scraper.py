@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 
 
-# ── RSS FEEDS ──────────────────────────────────────────────────────────────────
+#  RSS FEEDS 
 
 RSS_FEEDS = [
     ("CoinDesk",         "https://www.coindesk.com/arc/outboundfeeds/rss/"),
@@ -64,11 +64,11 @@ def get_fear_greed() -> dict:
         d = data["data"]
         current = int(d[0]["value"])
         prev    = int(d[1]["value"]) if len(d) > 1 else current
-        trend   = "↑ improving" if current > prev else "↓ worsening" if current < prev else "→ stable"
+        trend   = " improving" if current > prev else " worsening" if current < prev else " stable"
         return {"value": current, "label": d[0]["value_classification"], "trend": trend}
     except Exception as e:
         print(f"  Fear&Greed error: {e}")
-        return {"value": 50, "label": "Neutral", "trend": "→ stable"}
+        return {"value": 50, "label": "Neutral", "trend": " stable"}
 
 
 def get_coingecko_trending() -> list:
@@ -108,12 +108,12 @@ def get_forex_factory_events() -> str:
                 if now - timedelta(hours=1) <= dt <= cutoff:
                     diff = int((dt - now).total_seconds() / 60)
                     status = f"in {diff}min" if diff > 0 else f"{abs(diff)}min ago"
-                    high_events.append(f"{ev['title']} ({ev['country']}) — {status} | forecast:{ev.get('forecast','?')} prev:{ev.get('previous','?')}")
+                    high_events.append(f"{ev['title']} ({ev['country']})  {status} | forecast:{ev.get('forecast','?')} prev:{ev.get('previous','?')}")
             except: pass
 
         if high_events:
-            return "⚠️ HIGH-IMPACT EVENTS SOON:\n" + "\n".join(high_events[:4])
-        return "No high-impact events next 8 hours ✅"
+            return " HIGH-IMPACT EVENTS SOON:\n" + "\n".join(high_events[:4])
+        return "No high-impact events next 8 hours "
     except Exception as e:
         return f"Calendar unavailable: {e}"
 

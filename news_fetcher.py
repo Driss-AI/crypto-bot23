@@ -3,10 +3,10 @@ import json
 import datetime
 
 def get_latest_news():
-    print("📰 Fetching crypto sentiment...")
+    print(" Fetching crypto sentiment...")
     all_articles = []
 
-    # ── SOURCE 1: Reddit r/Bitcoin ────────────────────────
+    #  SOURCE 1: Reddit r/Bitcoin 
     try:
         url = "https://www.reddit.com/r/Bitcoin/hot.json?limit=5"
         req = urllib.request.Request(url, headers={"User-Agent": "CryptoBot/1.0"})
@@ -21,11 +21,11 @@ def get_latest_news():
                     "title" : title,
                     "score" : score,
                 })
-        print(f"✅ Reddit r/Bitcoin: {len(all_articles)} posts")
+        print(f" Reddit r/Bitcoin: {len(all_articles)} posts")
     except Exception as e:
-        print(f"⚠️ Reddit failed: {e}")
+        print(f" Reddit failed: {e}")
 
-    # ── SOURCE 2: Reddit r/CryptoCurrency ─────────────────
+    #  SOURCE 2: Reddit r/CryptoCurrency 
     try:
         url = "https://www.reddit.com/r/CryptoCurrency/hot.json?limit=5"
         req = urllib.request.Request(url, headers={"User-Agent": "CryptoBot/1.0"})
@@ -40,11 +40,11 @@ def get_latest_news():
                     "title" : title,
                     "score" : score,
                 })
-        print(f"✅ Reddit r/CryptoCurrency: {len(all_articles)} posts")
+        print(f" Reddit r/CryptoCurrency: {len(all_articles)} posts")
     except Exception as e:
-        print(f"⚠️ Reddit r/CryptoCurrency failed: {e}")
+        print(f" Reddit r/CryptoCurrency failed: {e}")
 
-    # ── SOURCE 3: Fear & Greed Index ──────────────────────
+    #  SOURCE 3: Fear & Greed Index 
     fng_text = ""
     try:
         url = "https://api.alternative.me/fng/?limit=1"
@@ -56,27 +56,27 @@ def get_latest_news():
             label = fng["value_classification"]
 
             if value <= 25:
-                mood = "😱 EXTREME FEAR — possible buy opportunity"
+                mood = " EXTREME FEAR  possible buy opportunity"
             elif value <= 45:
-                mood = "😟 FEAR — market is worried"
+                mood = " FEAR  market is worried"
             elif value <= 55:
-                mood = "😐 NEUTRAL — no strong sentiment"
+                mood = " NEUTRAL  no strong sentiment"
             elif value <= 75:
-                mood = "😊 GREED — investors are excited"
+                mood = " GREED  investors are excited"
             else:
-                mood = "🤑 EXTREME GREED — possible sell opportunity"
+                mood = " EXTREME GREED  possible sell opportunity"
 
-            fng_text = f"\n🧠 FEAR & GREED INDEX: {value}/100 — {label}\n   {mood}\n"
-            print(f"✅ Fear & Greed: {value}/100 ({label})")
+            fng_text = f"\n FEAR & GREED INDEX: {value}/100  {label}\n   {mood}\n"
+            print(f" Fear & Greed: {value}/100 ({label})")
     except Exception as e:
-        print(f"⚠️ Fear & Greed failed: {e}")
+        print(f" Fear & Greed failed: {e}")
 
-    # ── FORMAT FOR CLAUDE ─────────────────────────────────
-    news_text = "📰 CRYPTO SENTIMENT:\n"
+    #  FORMAT FOR CLAUDE 
+    news_text = " CRYPTO SENTIMENT:\n"
     news_text += "-" * 40 + "\n"
 
     if all_articles:
-        news_text += "🔥 Trending on Reddit:\n"
+        news_text += " Trending on Reddit:\n"
         for i, article in enumerate(all_articles[:8], 1):
             news_text += f"{i}. [{article['source']}] {article['title']}\n"
 
@@ -88,7 +88,7 @@ def get_latest_news():
 
     return news_text
 
-# ── TEST ─────────────────────────────────────────────────
+#  TEST 
 if __name__ == "__main__":
     news = get_latest_news()
     print("\n" + news)

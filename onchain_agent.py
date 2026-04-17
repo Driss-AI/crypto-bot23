@@ -1,5 +1,5 @@
 """
-AGENT 2 — On-Chain Agent
+AGENT 2  On-Chain Agent
 Watches what the BIG money is doing using free on-chain APIs.
 
 Sources:
@@ -7,7 +7,7 @@ Sources:
   - Blockchain.info: BTC mempool and transaction data
   - Coinglass proxy: open interest trend approximation
 
-This is the signal humans CAN'T watch manually — 24/7 whale tracking.
+This is the signal humans CAN'T watch manually  24/7 whale tracking.
 """
 
 import urllib.request
@@ -18,7 +18,7 @@ from datetime import datetime
 class OnChainAgent:
     def __init__(self):
         self.name = "onchain"
-        print("🐋 On-Chain Agent initialized")
+        print(" On-Chain Agent initialized")
 
     def _fetch(self, url: str) -> dict | None:
         try:
@@ -28,10 +28,10 @@ class OnChainAgent:
             with urllib.request.urlopen(req, timeout=10) as r:
                 return json.loads(r.read())
         except Exception as e:
-            print(f"  ⚠️ Fetch error ({url[:50]}): {e}")
+            print(f"   Fetch error ({url[:50]}): {e}")
             return None
 
-    # ── DATA SOURCES ─────────────────────────────────────────────────────────
+    #  DATA SOURCES 
 
     def get_exchange_flow(self, symbol: str = "bitcoin") -> dict | None:
         """
@@ -56,19 +56,19 @@ class OnChainAgent:
         # Determine flow signal
         if price_change_24h > 3 and volume_to_mcap > 0.05:
             signal    = "STRONG_INFLOW"
-            reasoning = f"Price +{price_change_24h:.1f}% with high volume — buyers in control"
+            reasoning = f"Price +{price_change_24h:.1f}% with high volume  buyers in control"
         elif price_change_24h > 1:
             signal    = "MILD_INFLOW"
-            reasoning = f"Price +{price_change_24h:.1f}% — mild accumulation"
+            reasoning = f"Price +{price_change_24h:.1f}%  mild accumulation"
         elif price_change_24h < -3 and volume_to_mcap > 0.05:
             signal    = "STRONG_OUTFLOW"
-            reasoning = f"Price {price_change_24h:.1f}% with high volume — sellers in control"
+            reasoning = f"Price {price_change_24h:.1f}% with high volume  sellers in control"
         elif price_change_24h < -1:
             signal    = "MILD_OUTFLOW"
-            reasoning = f"Price {price_change_24h:.1f}% — mild distribution"
+            reasoning = f"Price {price_change_24h:.1f}%  mild distribution"
         else:
             signal    = "NEUTRAL"
-            reasoning = f"Price {price_change_24h:.1f}% — no clear directional flow"
+            reasoning = f"Price {price_change_24h:.1f}%  no clear directional flow"
 
         return {
             "price_change_24h" : round(price_change_24h, 2),
@@ -80,7 +80,7 @@ class OnChainAgent:
 
     def get_btc_mempool(self) -> dict | None:
         """
-        BTC mempool size — high mempool = lots of transactions = active market.
+        BTC mempool size  high mempool = lots of transactions = active market.
         Very high mempool often signals a big move is underway.
         """
         data = self._fetch("https://mempool.space/api/mempool")
@@ -92,16 +92,16 @@ class OnChainAgent:
 
         if tx_count > 100_000:
             signal    = "VERY_HIGH_ACTIVITY"
-            reasoning = f"Mempool: {tx_count:,} txs — extreme network activity"
+            reasoning = f"Mempool: {tx_count:,} txs  extreme network activity"
         elif tx_count > 50_000:
             signal    = "HIGH_ACTIVITY"
-            reasoning = f"Mempool: {tx_count:,} txs — elevated activity"
+            reasoning = f"Mempool: {tx_count:,} txs  elevated activity"
         elif tx_count > 10_000:
             signal    = "NORMAL"
-            reasoning = f"Mempool: {tx_count:,} txs — normal activity"
+            reasoning = f"Mempool: {tx_count:,} txs  normal activity"
         else:
             signal    = "LOW_ACTIVITY"
-            reasoning = f"Mempool: {tx_count:,} txs — quiet network"
+            reasoning = f"Mempool: {tx_count:,} txs  quiet network"
 
         return {
             "tx_count" : tx_count,
@@ -130,13 +130,13 @@ class OnChainAgent:
         # Higher ratio = more coins in circulation = less HODLing = potential sell pressure
         if supply_ratio > 0.92:
             signal    = "HIGH_CIRCULATION"
-            reasoning = f"{supply_ratio*100:.1f}% in circulation — less HODLing, watch for sell pressure"
+            reasoning = f"{supply_ratio*100:.1f}% in circulation  less HODLing, watch for sell pressure"
         elif supply_ratio < 0.80:
             signal    = "HIGH_HODL"
-            reasoning = f"{supply_ratio*100:.1f}% in circulation — strong HODLing behavior"
+            reasoning = f"{supply_ratio*100:.1f}% in circulation  strong HODLing behavior"
         else:
             signal    = "NEUTRAL"
-            reasoning = f"{supply_ratio*100:.1f}% in circulation — balanced"
+            reasoning = f"{supply_ratio*100:.1f}% in circulation  balanced"
 
         return {
             "supply_ratio" : round(supply_ratio, 4),
@@ -144,13 +144,13 @@ class OnChainAgent:
             "reasoning"    : reasoning,
         }
 
-    # ── COMBINE INTO SCORE ────────────────────────────────────────────────────
+    #  COMBINE INTO SCORE 
 
     def analyze(self, symbol: str = "BTC/USDT") -> dict:
         """
         Combine all on-chain signals into one output for the Orchestrator.
         """
-        print(f"🐋 On-Chain Agent analyzing {symbol}...")
+        print(f" On-Chain Agent analyzing {symbol}...")
         coin = symbol.replace("/USDT", "").lower()
         cg_symbol = {"btc": "bitcoin", "eth": "ethereum",
                      "sol": "solana", "bnb": "binancecoin"}.get(coin, coin)
@@ -162,7 +162,7 @@ class OnChainAgent:
         score   = 0
         reasons = []
 
-        # ── Flow signal ──────────────────────────────────────
+        #  Flow signal 
         if flow:
             if flow["signal"] == "STRONG_INFLOW":
                 score += 3
@@ -174,7 +174,7 @@ class OnChainAgent:
                 score -= 1
             reasons.append(f"Flow: {flow['reasoning']}")
 
-        # ── Mempool (BTC only) ───────────────────────────────
+        #  Mempool (BTC only) 
         if mempool:
             if mempool["signal"] == "VERY_HIGH_ACTIVITY":
                 score += 1   # high activity often precedes big moves
@@ -182,7 +182,7 @@ class OnChainAgent:
                 score -= 1
             reasons.append(f"Mempool: {mempool['reasoning']}")
 
-        # ── Whale / supply signal ────────────────────────────
+        #  Whale / supply signal 
         if whale:
             if whale["signal"] == "HIGH_HODL":
                 score += 1
@@ -190,7 +190,7 @@ class OnChainAgent:
                 score -= 1
             reasons.append(f"Supply: {whale['reasoning']}")
 
-        # ── Convert to signal ────────────────────────────────
+        #  Convert to signal 
         if score >= 3:
             signal, confidence = "BUY", "high"
         elif score >= 1:
@@ -213,11 +213,11 @@ class OnChainAgent:
             "whale"      : whale,
         }
 
-        print(f"  → {signal} ({confidence}) | score: {score:+d}")
+        print(f"   {signal} ({confidence}) | score: {score:+d}")
         return result
 
 
-# ── Standalone test ───────────────────────────────────────
+#  Standalone test 
 if __name__ == "__main__":
     agent = OnChainAgent()
     result = agent.analyze("BTC/USDT")

@@ -1,12 +1,12 @@
 """
 WHALE DETECTOR
-═══════════════════════════════════════════════════════════
+
 Tracks large crypto movements using free sources:
 
-1. Etherscan API     — ETH large transactions (free key)
-2. Blockchain.com    — BTC large transactions (no key needed)
-3. CoinGecko         — Top holder concentrations
-4. Mempool.space     — BTC mempool large txs (no key needed)
+1. Etherscan API      ETH large transactions (free key)
+2. Blockchain.com     BTC large transactions (no key needed)
+3. CoinGecko          Top holder concentrations
+4. Mempool.space      BTC mempool large txs (no key needed)
 
 What we're looking for:
 - Large BTC/ETH moving TO exchanges = sell pressure
@@ -44,7 +44,7 @@ KNOWN_EXCHANGES = {
 }
 
 
-# ── BTC WHALE DETECTOR (Blockchain.com) ──────────────────────────────────────
+#  BTC WHALE DETECTOR (Blockchain.com) 
 
 def get_btc_large_txs(min_btc: float = 100) -> list[dict]:
     """
@@ -81,19 +81,19 @@ def get_btc_large_txs(min_btc: float = 100) -> list[dict]:
                     "amount_usd": 0,  # will calculate with price
                     "tx_hash"  : tx_hash,
                     "type"     : "LARGE_TX",
-                    "title"    : f"🐋 BTC: {total_out:.1f} BTC moved (${total_out * 74000:,.0f})",
+                    "title"    : f" BTC: {total_out:.1f} BTC moved (${total_out * 74000:,.0f})",
                     "signal"   : "NEUTRAL",
                 })
 
-        print(f"  ✅ BTC Whales: {len(whales)} large txs (≥{min_btc} BTC)")
+        print(f"   BTC Whales: {len(whales)} large txs ({min_btc} BTC)")
 
     except Exception as e:
-        print(f"  ⚠️ BTC Whales error: {e}")
+        print(f"   BTC Whales error: {e}")
 
     return whales[:5]  # top 5
 
 
-# ── ETH WHALE DETECTOR (Etherscan) ───────────────────────────────────────────
+#  ETH WHALE DETECTOR (Etherscan) 
 
 def get_eth_large_txs(min_eth: float = 500) -> list[dict]:
     """
@@ -103,7 +103,7 @@ def get_eth_large_txs(min_eth: float = 500) -> list[dict]:
     whales = []
 
     if not ETHERSCAN_KEY:
-        print("  ⚠️ ETH Whales: No ETHERSCAN_API_KEY set")
+        print("   ETH Whales: No ETHERSCAN_API_KEY set")
         return whales
 
     try:
@@ -139,16 +139,16 @@ def get_eth_large_txs(min_eth: float = 500) -> list[dict]:
                 # Determine signal
                 if to_addr in KNOWN_EXCHANGES:
                     signal  = "BEARISH"  # moving TO exchange = potential sell
-                    emoji   = "📤"
-                    context = f"→ {to_name} (exchange inflow ⚠️)"
+                    emoji   = ""
+                    context = f" {to_name} (exchange inflow )"
                 elif from_addr in KNOWN_EXCHANGES:
                     signal  = "BULLISH"  # moving FROM exchange = accumulation
-                    emoji   = "📥"
-                    context = f"← {from_name} (exchange outflow ✅)"
+                    emoji   = ""
+                    context = f" {from_name} (exchange outflow )"
                 else:
                     signal  = "NEUTRAL"
-                    emoji   = "🐋"
-                    context = f"{from_name} → {to_name}"
+                    emoji   = ""
+                    context = f"{from_name}  {to_name}"
 
                 whales.append({
                     "chain"  : "ETH",
@@ -159,15 +159,15 @@ def get_eth_large_txs(min_eth: float = 500) -> list[dict]:
                     "title"  : f"{emoji} ETH: {value_eth:.0f} ETH (${value_eth*2400:,.0f}) {context}",
                 })
 
-        print(f"  ✅ ETH Whales: {len(whales)} large txs (≥{min_eth} ETH)")
+        print(f"   ETH Whales: {len(whales)} large txs ({min_eth} ETH)")
 
     except Exception as e:
-        print(f"  ⚠️ ETH Whales error: {e}")
+        print(f"   ETH Whales error: {e}")
 
     return whales[:5]
 
 
-# ── BTC MEMPOOL (large pending txs) ──────────────────────────────────────────
+#  BTC MEMPOOL (large pending txs) 
 
 def get_btc_mempool_whales(min_btc: float = 50) -> dict:
     """
@@ -193,32 +193,32 @@ def get_btc_mempool_whales(min_btc: float = 50) -> dict:
 
         if tx_count > 100_000:
             signal = "HIGH_ACTIVITY"
-            note   = "Extreme network activity — big move likely"
+            note   = "Extreme network activity  big move likely"
         elif tx_count > 50_000:
             signal = "ELEVATED"
-            note   = "Elevated activity — market is busy"
+            note   = "Elevated activity  market is busy"
         elif tx_count > 10_000:
             signal = "NORMAL"
             note   = "Normal activity"
         else:
             signal = "QUIET"
-            note   = "Low activity — quiet market"
+            note   = "Low activity  quiet market"
 
         result = {
             "tx_count"     : tx_count,
             "vsize_mb"     : round(vsize / 1_000_000, 2),
             "signal"       : signal,
-            "title"        : f"⛓️ BTC Mempool: {tx_count:,} txs — {note}",
+            "title"        : f" BTC Mempool: {tx_count:,} txs  {note}",
         }
-        print(f"  ✅ BTC Mempool: {tx_count:,} pending txs ({signal})")
+        print(f"   BTC Mempool: {tx_count:,} pending txs ({signal})")
 
     except Exception as e:
-        print(f"  ⚠️ BTC Mempool: {e}")
+        print(f"   BTC Mempool: {e}")
 
     return result
 
 
-# ── COINGECKO EXCHANGE FLOWS ──────────────────────────────────────────────────
+#  COINGECKO EXCHANGE FLOWS 
 
 def get_exchange_flows(coin_id: str = "bitcoin") -> dict:
     """
@@ -243,19 +243,19 @@ def get_exchange_flows(coin_id: str = "bitcoin") -> dict:
 
         if price_change_24h > 5 and vol_ratio > 0.05:
             signal    = "STRONG_INFLOW"
-            reasoning = f"Price +{price_change_24h:.1f}% with high volume — strong buying"
+            reasoning = f"Price +{price_change_24h:.1f}% with high volume  strong buying"
         elif price_change_24h > 2:
             signal    = "MILD_INFLOW"
-            reasoning = f"Price +{price_change_24h:.1f}% — accumulation"
+            reasoning = f"Price +{price_change_24h:.1f}%  accumulation"
         elif price_change_24h < -5 and vol_ratio > 0.05:
             signal    = "STRONG_OUTFLOW"
-            reasoning = f"Price {price_change_24h:.1f}% with high volume — selling pressure"
+            reasoning = f"Price {price_change_24h:.1f}% with high volume  selling pressure"
         elif price_change_24h < -2:
             signal    = "MILD_OUTFLOW"
-            reasoning = f"Price {price_change_24h:.1f}% — distribution"
+            reasoning = f"Price {price_change_24h:.1f}%  distribution"
         else:
             signal    = "NEUTRAL"
-            reasoning = f"Price {price_change_24h:.1f}% — sideways"
+            reasoning = f"Price {price_change_24h:.1f}%  sideways"
 
         result = {
             "signal"       : signal,
@@ -264,15 +264,15 @@ def get_exchange_flows(coin_id: str = "bitcoin") -> dict:
             "vol_ratio"    : round(vol_ratio, 4),
             "reasoning"    : reasoning,
         }
-        print(f"  ✅ {coin_id} flows: {signal}")
+        print(f"   {coin_id} flows: {signal}")
 
     except Exception as e:
-        print(f"  ⚠️ Exchange flows error: {e}")
+        print(f"   Exchange flows error: {e}")
 
     return result
 
 
-# ── MAIN WHALE ANALYZER ───────────────────────────────────────────────────────
+#  MAIN WHALE ANALYZER 
 
 def analyze_whales(symbol: str = "BTC/USDT") -> dict:
     """
@@ -280,7 +280,7 @@ def analyze_whales(symbol: str = "BTC/USDT") -> dict:
     Returns structured signal for the Orchestrator.
     """
     coin = symbol.replace("/USDT", "").upper()
-    print(f"\n🐋 Whale Detector analyzing {coin}...")
+    print(f"\n Whale Detector analyzing {coin}...")
 
     # Map to CoinGecko IDs
     cg_ids = {
@@ -318,10 +318,10 @@ def analyze_whales(symbol: str = "BTC/USDT") -> dict:
     bullish_eth = sum(1 for w in eth_whales if w["signal"] == "BULLISH")
     if bearish_eth > bullish_eth:
         score -= 2
-        reasons.append(f"{bearish_eth} large ETH txs to exchanges ⚠️")
+        reasons.append(f"{bearish_eth} large ETH txs to exchanges ")
     elif bullish_eth > bearish_eth:
         score += 2
-        reasons.append(f"{bullish_eth} large ETH txs from exchanges ✅")
+        reasons.append(f"{bullish_eth} large ETH txs from exchanges ")
 
     # Mempool signal
     if mempool.get("signal") == "HIGH_ACTIVITY":
@@ -362,28 +362,28 @@ def analyze_whales(symbol: str = "BTC/USDT") -> dict:
         "mempool"    : mempool,
     }
 
-    print(f"  → {signal} ({confidence}) | score: {score:+d}")
+    print(f"   {signal} ({confidence}) | score: {score:+d}")
     return result
 
 
 def format_whale_summary(result: dict) -> str:
     """Format whale analysis for AI prompt injection."""
     lines = [
-        f"🐋 WHALE ANALYSIS: {result['signal']} ({result['confidence']})",
+        f" WHALE ANALYSIS: {result['signal']} ({result['confidence']})",
         f"Score: {result['score']:+d}",
         f"Reasoning: {result['reasoning']}",
     ]
     if result.get("alerts"):
         lines.append("Alerts:")
         for a in result["alerts"]:
-            lines.append(f"  • {a}")
+            lines.append(f"   {a}")
     return "\n".join(lines)
 
 
-# ── Standalone test ───────────────────────────────────────────────────────────
+#  Standalone test 
 
 if __name__ == "__main__":
-    print("🐋 WHALE DETECTOR TEST")
+    print(" WHALE DETECTOR TEST")
     print("="*55)
 
     for symbol in ["BTC/USDT", "ETH/USDT"]:
@@ -395,5 +395,5 @@ if __name__ == "__main__":
         if result["alerts"]:
             print(f"  Alerts:")
             for a in result["alerts"]:
-                print(f"    • {a}")
+                print(f"     {a}")
         print("="*55)

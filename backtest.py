@@ -3,7 +3,7 @@ import pandas as pd
 import pandas_ta as ta
 import datetime
 
-# ── SETTINGS ─────────────────────────────────────────────
+#  SETTINGS 
 STARTING_CAPITAL = 1000
 RISK_PER_TRADE   = 0.02
 STOP_LOSS_PCT    = 0.03
@@ -12,9 +12,9 @@ SYMBOL           = "BTC/USDT"
 TIMEFRAME        = "1h"
 MONTHS_BACK      = 6
 
-# ── FETCH HISTORICAL DATA ────────────────────────────────
+#  FETCH HISTORICAL DATA 
 def fetch_historical_data():
-    print("📡 Fetching 6 months of BTC historical data from Binance...")
+    print(" Fetching 6 months of BTC historical data from Binance...")
     exchange = ccxt.binance()
 
     since = exchange.parse8601(
@@ -34,12 +34,12 @@ def fetch_historical_data():
 
     df = pd.DataFrame(all_candles, columns=["timestamp", "open", "high", "low", "close", "volume"])
     df["time"] = pd.to_datetime(df["timestamp"], unit="ms")
-    print(f"✅ Got {len(df)} candles from {df['time'].iloc[0].strftime('%Y-%m-%d')} to {df['time'].iloc[-1].strftime('%Y-%m-%d')}")
+    print(f" Got {len(df)} candles from {df['time'].iloc[0].strftime('%Y-%m-%d')} to {df['time'].iloc[-1].strftime('%Y-%m-%d')}")
     return df
 
-# ── CALCULATE INDICATORS ─────────────────────────────────
+#  CALCULATE INDICATORS 
 def add_indicators(df):
-    print("📊 Calculating indicators...")
+    print(" Calculating indicators...")
     df["rsi"] = ta.rsi(df["close"], length=14)
 
     macd = ta.macd(df["close"])
@@ -54,7 +54,7 @@ def add_indicators(df):
     df["volume_avg"] = df["volume"].rolling(20).mean()
     return df.dropna()
 
-# ── TRADING SIGNAL ───────────────────────────────────────
+#  TRADING SIGNAL 
 def get_signal(row):
     rsi      = row["rsi"]
     price    = row["close"]
@@ -79,9 +79,9 @@ def get_signal(row):
 
     return "HOLD"
 
-# ── RUN BACKTEST ─────────────────────────────────────────
+#  RUN BACKTEST 
 def run_backtest(df):
-    print("🔄 Running backtest...\n")
+    print(" Running backtest...\n")
 
     capital      = STARTING_CAPITAL
     position     = None
@@ -111,7 +111,7 @@ def run_backtest(df):
                     "entry_price" : entry,
                     "exit_price"  : price,
                     "pnl"         : round(pnl, 2),
-                    "exit_reason" : "Stop Loss 🛑"
+                    "exit_reason" : "Stop Loss "
                 })
                 position = None
 
@@ -125,7 +125,7 @@ def run_backtest(df):
                     "entry_price" : entry,
                     "exit_price"  : price,
                     "pnl"         : round(pnl, 2),
-                    "exit_reason" : "Take Profit ✅"
+                    "exit_reason" : "Take Profit "
                 })
                 position = None
 
@@ -143,10 +143,10 @@ def run_backtest(df):
 
     return trades, equity_curve
 
-# ── PRINT RESULTS ─────────────────────────────────────────
+#  PRINT RESULTS 
 def print_results(trades, equity_curve):
     if not trades:
-        print("⚠️ No trades were made — conditions too strict!")
+        print(" No trades were made  conditions too strict!")
         return
 
     total_trades  = len(trades)
@@ -171,53 +171,53 @@ def print_results(trades, equity_curve):
             drawdown = dd
 
     print("\n" + "="*55)
-    print("  📊 BACKTEST RESULTS")
+    print("   BACKTEST RESULTS")
     print("="*55)
     print(f"  Period        : Last {MONTHS_BACK} months")
     print(f"  Symbol        : {SYMBOL}")
     print(f"  Timeframe     : {TIMEFRAME}")
     print("-"*55)
-    print(f"  💰 Starting capital : ${STARTING_CAPITAL:,.2f}")
-    print(f"  💰 Final capital    : ${final_capital:,.2f}")
-    print(f"  📈 Total return     : {total_return:+.1f}%")
-    print(f"  📉 Max drawdown     : -{drawdown:.1f}%")
+    print(f"   Starting capital : ${STARTING_CAPITAL:,.2f}")
+    print(f"   Final capital    : ${final_capital:,.2f}")
+    print(f"   Total return     : {total_return:+.1f}%")
+    print(f"   Max drawdown     : -{drawdown:.1f}%")
     print("-"*55)
-    print(f"  🔢 Total trades     : {total_trades}")
-    print(f"  ✅ Winners          : {len(winners)} ({win_rate:.1f}%)")
-    print(f"  ❌ Losers           : {len(losers)} ({100-win_rate:.1f}%)")
-    print(f"  💵 Avg win          : ${avg_win:.2f}")
-    print(f"  💸 Avg loss         : ${avg_loss:.2f}")
-    print(f"  🏆 Best trade       : ${best_trade['pnl']:.2f} ({best_trade['exit_time'].strftime('%Y-%m-%d')})")
-    print(f"  💀 Worst trade      : ${worst_trade['pnl']:.2f} ({worst_trade['exit_time'].strftime('%Y-%m-%d')})")
+    print(f"   Total trades     : {total_trades}")
+    print(f"   Winners          : {len(winners)} ({win_rate:.1f}%)")
+    print(f"   Losers           : {len(losers)} ({100-win_rate:.1f}%)")
+    print(f"   Avg win          : ${avg_win:.2f}")
+    print(f"   Avg loss         : ${avg_loss:.2f}")
+    print(f"   Best trade       : ${best_trade['pnl']:.2f} ({best_trade['exit_time'].strftime('%Y-%m-%d')})")
+    print(f"   Worst trade      : ${worst_trade['pnl']:.2f} ({worst_trade['exit_time'].strftime('%Y-%m-%d')})")
     print("-"*55)
 
     sl_exits = len([t for t in trades if "Stop" in t["exit_reason"]])
     tp_exits = len([t for t in trades if "Take" in t["exit_reason"]])
-    print(f"  🛑 Stop loss exits  : {sl_exits}")
-    print(f"  ✅ Take profit exits: {tp_exits}")
+    print(f"   Stop loss exits  : {sl_exits}")
+    print(f"   Take profit exits: {tp_exits}")
     print("="*55)
 
     if total_return > 20 and win_rate > 55 and drawdown < 15:
-        grade = "🟢 EXCELLENT — Consider paper trading this!"
+        grade = " EXCELLENT  Consider paper trading this!"
     elif total_return > 5 and win_rate > 45:
-        grade = "🟡 DECENT — Needs refinement before live trading"
+        grade = " DECENT  Needs refinement before live trading"
     elif total_return > 0:
-        grade = "🟠 MARGINAL — Barely profitable, needs work"
+        grade = " MARGINAL  Barely profitable, needs work"
     else:
-        grade = "🔴 POOR — Do not trade this strategy live"
+        grade = " POOR  Do not trade this strategy live"
 
     print(f"\n  Strategy grade: {grade}")
     print("="*55)
 
-    print("\n  📋 Last 5 trades:")
+    print("\n   Last 5 trades:")
     print(f"  {'Date':<12} {'Dir':<6} {'Entry':>10} {'Exit':>10} {'PnL':>8} {'Reason'}")
     print("  " + "-"*65)
     for t in trades[-5:]:
         print(f"  {t['exit_time'].strftime('%Y-%m-%d'):<12} {t['direction']:<6} ${t['entry_price']:>9,.0f} ${t['exit_price']:>9,.0f} ${t['pnl']:>7.2f} {t['exit_reason']}")
 
-    print("\n✅ Backtest complete!\n")
+    print("\n Backtest complete!\n")
 
-# ── MAIN ─────────────────────────────────────────────────
+#  MAIN 
 if __name__ == "__main__":
     df = fetch_historical_data()
     df = add_indicators(df)

@@ -1,5 +1,5 @@
 """
-ORCHESTRATOR v2 — fixed: shared macro, None-safe onchain
+ORCHESTRATOR v2  fixed: shared macro, None-safe onchain
 """
 
 import anthropic
@@ -28,17 +28,17 @@ class Orchestrator:
         self.memory       = AgentMemory()
         self.rm           = RiskManager(total_capital=total_capital)
         self.shared_macro = None
-        print("\n🧠 Orchestrator online — all agents ready\n")
+        print("\n Orchestrator online  all agents ready\n")
 
     def analyze(self, symbol):
         coin = symbol.replace("/USDT","")
-        print(f"\n{'='*55}\n  🎯 ORCHESTRATOR: Analyzing {coin}\n{'='*55}")
+        print(f"\n{'='*55}\n   ORCHESTRATOR: Analyzing {coin}\n{'='*55}")
 
         results = {}
         def run(name, fn):
             try: results[name] = fn()
             except Exception as e:
-                print(f"  ⚠️ {name} failed: {e}")
+                print(f"   {name} failed: {e}")
                 results[name] = None
 
         # Get price for Grok context
@@ -120,7 +120,7 @@ class Orchestrator:
     def _ask_claude(self, symbol, data, macro, onchain, news, consensus, weights):
         coin = symbol.replace("/USDT","")
 
-        macro_text = "Macro unavailable (rate limited — will retry next cycle)"
+        macro_text = "Macro unavailable (rate limited  will retry next cycle)"
         if macro:
             fg = macro.get("fear_greed") or {}
             macro_text = (
@@ -148,25 +148,25 @@ class Orchestrator:
         prompt = f"""You are the master orchestrator of a multi-agent crypto trading system.
 Make the FINAL trading decision for {coin}/USDT.
 
-📊 TECHNICAL (weight {weights['technical']*100:.0f}%):
+ TECHNICAL (weight {weights['technical']*100:.0f}%):
 Price: ${data.get('price',0):,.2f} | RSI 1h: {data.get('rsi',0):.1f} | RSI 4h: {data.get('rsi_4h',0):.1f}
 MACD: {'Bullish' if data.get('macd',0)>data.get('macd_sig',0) else 'Bearish'}
-BB: {'ABOVE upper ⚠️' if data.get('price',0)>data.get('bb_upper',0) else 'BELOW lower 💡' if data.get('price',0)<data.get('bb_lower',0) else 'Inside bands'}
+BB: {'ABOVE upper ' if data.get('price',0)>data.get('bb_upper',0) else 'BELOW lower ' if data.get('price',0)<data.get('bb_lower',0) else 'Inside bands'}
 Volume: {data.get('volume',0):,.0f} vs avg {data.get('vol_avg',0):,.0f} | 4H: {data.get('trend_4h','?')}
 Consensus: {consensus['score']:+.3f}
 
-🌍 MACRO (weight {weights['macro']*100:.0f}%):
+ MACRO (weight {weights['macro']*100:.0f}%):
 {macro_text}
 
-🐋 ON-CHAIN (weight {weights['onchain']*100:.0f}%):
+ ON-CHAIN (weight {weights['onchain']*100:.0f}%):
 {onchain_text}
 
-📰 SENTIMENT:
+ SENTIMENT:
 {news[:500]}
 
 Weights: {wt}
 
-🐦 GROK X/TWITTER SENTIMENT (weight: 15%):
+ GROK X/TWITTER SENTIMENT (weight: 15%):
 X Mood: {grok_mood}
 Signal: {grok_signal}
 Key Insight: {grok_insight}
@@ -198,12 +198,12 @@ Rules: HOLD if data missing or signals conflict. Only trade when agents agree.""
 
     def print_decision(self, result):
         a = result["action"]
-        e = "🟢" if a=="BUY" else "🔴" if a=="SELL" else "🟡"
-        print(f"\n{'━'*55}")
+        e = "" if a=="BUY" else "" if a=="SELL" else ""
+        print(f"\n{''*55}")
         print(f"  {e} FINAL: {a} {result['symbol'].replace('/USDT','')}")
         print(f"  Confidence: {result['confidence'].upper()} | Score: {result['consensus_score']:+.3f}")
         print(f"  Price: ${result['price']:,.2f}")
         print(f"  Why:  {result['reasoning']}")
         print(f"  Risk: {result['risks']}")
-        print(f"  {'✅' if result['approved'] else '❌'} {result['risk_reason']}")
-        print(f"{'━'*55}\n")
+        print(f"  {'' if result['approved'] else ''} {result['risk_reason']}")
+        print(f"{''*55}\n")

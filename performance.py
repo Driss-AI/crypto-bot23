@@ -1,5 +1,5 @@
 """
-Performance tracker — PostgreSQL version
+Performance tracker  PostgreSQL version
 Survives Railway reboots. Falls back to JSON if no DATABASE_URL.
 """
 
@@ -46,7 +46,7 @@ def get_conn():
     return None
 
 
-# ── JSON fallback helpers ─────────────────────────────────
+#  JSON fallback helpers 
 
 def load_trades():
     if USE_PG:
@@ -62,7 +62,7 @@ def save_trades(trades):
         json.dump(trades, f, indent=2)
 
 
-# ── Main functions ────────────────────────────────────────
+#  Main functions 
 
 def record_trade(action, entry_price, stop_loss, take_profit, size, confidence):
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -79,7 +79,7 @@ def record_trade(action, entry_price, stop_loss, take_profit, size, confidence):
         trade_id = c.fetchone()[0]
         conn.commit()
         conn.close()
-        print(f"📝 Trade #{trade_id} recorded!")
+        print(f" Trade #{trade_id} recorded!")
         return trade_id
     else:
         trades   = load_trades()
@@ -93,7 +93,7 @@ def record_trade(action, entry_price, stop_loss, take_profit, size, confidence):
             "pnl": None, "exit_reason": None,
         })
         save_trades(trades)
-        print(f"📝 Trade #{trade_id} recorded!")
+        print(f" Trade #{trade_id} recorded!")
         return trade_id
 
 
@@ -122,7 +122,7 @@ def update_trade(trade_id, current_price):
 
         if hit_sl or hit_tp:
             exit_price  = sl if hit_sl else tp
-            exit_reason = "Stop Loss 🛑" if hit_sl else "Take Profit ✅"
+            exit_reason = "Stop Loss " if hit_sl else "Take Profit "
             pnl         = size * pnl_pct
             c.execute("""
                 UPDATE paper_trades
@@ -159,7 +159,7 @@ def update_trade(trade_id, current_price):
             if hit_sl or hit_tp:
                 trade["status"]      = "CLOSED"
                 trade["exit_price"]  = sl if hit_sl else tp
-                trade["exit_reason"] = "Stop Loss 🛑" if hit_sl else "Take Profit ✅"
+                trade["exit_reason"] = "Stop Loss " if hit_sl else "Take Profit "
                 trade["pnl"]         = round(size * abs(pnl_pct), 2) * (1 if not hit_sl else -1)
                 updated = True
 
@@ -182,7 +182,7 @@ def get_performance_report():
         trades = load_trades()
 
     if not trades:
-        return "📊 No trades recorded yet."
+        return " No trades recorded yet."
 
     closed  = [t for t in trades if t["status"] == "CLOSED"]
     open_t  = [t for t in trades if t["status"] == "OPEN"]
@@ -194,20 +194,20 @@ def get_performance_report():
     avg_loss  = sum(t["pnl"] for t in losers)  / len(losers)  if losers  else 0
 
     report = (
-        f"📊 PAPER TRADING PERFORMANCE\n"
+        f" PAPER TRADING PERFORMANCE\n"
         f"{'='*30}\n\n"
-        f"💰 Total P&L: ${total_pnl:+.2f}\n"
-        f"💼 Capital: $1,000 → ${1000+total_pnl:,.2f}\n\n"
-        f"📋 Trades:\n"
+        f" Total P&L: ${total_pnl:+.2f}\n"
+        f" Capital: $1,000  ${1000+total_pnl:,.2f}\n\n"
+        f" Trades:\n"
         f"- Total: {len(trades)} | Open: {len(open_t)} | Closed: {len(closed)}\n"
-        f"- Wins: {len(winners)} ✅ | Losses: {len(losers)} ❌\n"
+        f"- Wins: {len(winners)}  | Losses: {len(losers)} \n"
         f"- Win rate: {win_rate:.1f}%\n\n"
-        f"💵 Avg win: ${avg_win:.2f} | Avg loss: ${avg_loss:.2f}\n\n"
-        f"📋 Last 5 trades:\n"
+        f" Avg win: ${avg_win:.2f} | Avg loss: ${avg_loss:.2f}\n\n"
+        f" Last 5 trades:\n"
     )
     for t in list(reversed(trades))[:5]:
         pnl_str = f"${t['pnl']:+.2f}" if t["pnl"] is not None else "OPEN"
-        report += f"• {t['timestamp']} {t['action']} @ ${t['entry_price']:,.0f} → {pnl_str}\n"
+        report += f" {t['timestamp']} {t['action']} @ ${t['entry_price']:,.0f}  {pnl_str}\n"
 
     return report
 

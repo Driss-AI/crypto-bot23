@@ -1,6 +1,6 @@
 """
 GROK SENTIMENT AGENT
-═══════════════════════════════════════════════════════════
+
 Uses xAI's Grok model with real-time X/Twitter access.
 This is the ONLY agent that can read live social media.
 
@@ -30,17 +30,17 @@ class GrokSentimentAgent:
         self.name  = "grok_sentiment"
         self.style = "sentiment"
         if not GROK_API_KEY:
-            print("⚠️ GrokSentimentAgent: No GROK_API_KEY found")
+            print(" GrokSentimentAgent: No GROK_API_KEY found")
         else:
-            print("🤖 Grok Sentiment Agent initialized — X/Twitter access active")
+            print(" Grok Sentiment Agent initialized  X/Twitter access active")
 
     def analyze(self, symbol: str, price: float = 0, fear_greed: int = 50) -> dict:
         """
         Ask Grok to analyze real-time X/Twitter sentiment for the coin.
-        Grok has live access to X — no other model can do this.
+        Grok has live access to X  no other model can do this.
         """
         coin = symbol.replace("/USDT", "")
-        print(f"  🤖 Grok analyzing {coin} sentiment on X/Twitter...")
+        print(f"   Grok analyzing {coin} sentiment on X/Twitter...")
 
         if not GROK_API_KEY:
             return self._empty(symbol, "No API key")
@@ -53,7 +53,7 @@ Look for:
 1. Recent tweets from crypto influencers about {coin}
 2. Whale alert mentions
 3. Breaking news or FUD
-4. Community mood — are people bullish or bearish?
+4. Community mood  are people bullish or bearish?
 5. Any unusual activity, hacks, partnerships, listings
 6. Trending hashtags related to {coin}
 
@@ -88,14 +88,14 @@ Be specific about what you actually see on X right now. If you see whale movemen
             )
 
             if response.status_code != 200:
-                print(f"  ⚠️ Grok API error: {response.status_code} — {response.text[:100]}")
+                print(f"   Grok API error: {response.status_code}  {response.text[:100]}")
                 return self._empty(symbol, f"API error {response.status_code}")
 
             text = response.json()["choices"][0]["message"]["content"]
             return self._parse(symbol, text)
 
         except Exception as e:
-            print(f"  ⚠️ Grok error: {e}")
+            print(f"   Grok error: {e}")
             return self._empty(symbol, str(e))
 
     def _parse(self, symbol: str, text: str) -> dict:
@@ -135,8 +135,8 @@ Be specific about what you actually see on X right now. If you see whale movemen
         else:
             action = "HOLD"
 
-        print(f"    → {action} ({confidence}) | X mood: {x_mood} | score: {score:+d}")
-        print(f"    💡 {key_insight[:80]}...")
+        print(f"     {action} ({confidence}) | X mood: {x_mood} | score: {score:+d}")
+        print(f"     {key_insight[:80]}...")
 
         return {
             "agent"      : self.name,
@@ -165,7 +165,7 @@ Be specific about what you actually see on X right now. If you see whale movemen
         }
 
 
-# ── Standalone test ───────────────────────────────────────
+#  Standalone test 
 if __name__ == "__main__":
     agent = GrokSentimentAgent()
     result = agent.analyze("BTC/USDT", price=83000, fear_greed=21)

@@ -76,6 +76,6 @@ with open("dashboard.py", "w") as f:
 
 # Verify
 if "coingecko" in content.lower():
-    print("✅ dashboard.py patched to use CoinGecko!")
+    print(" dashboard.py patched to use CoinGecko!")
 else:
-    print("⚠️ Patch may not have applied — check manually")
+    print(" Patch may not have applied  check manually")

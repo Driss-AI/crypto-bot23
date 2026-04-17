@@ -55,21 +55,21 @@ patches = [
 for old, new in patches:
     if old in content:
         content = content.replace(old, new)
-        print(f"✅ Patched: {old[:50]}...")
+        print(f" Patched: {old[:50]}...")
     else:
-        print(f"⚠️ Not found: {old[:50]}...")
+        print(f" Not found: {old[:50]}...")
 
 # Add grok section to Claude prompt
 old_prompt_section = "Weights: {wt}"
 new_prompt_section = """Weights: {wt}
 
-🐦 GROK X/TWITTER SENTIMENT (weight: 15%):
+ GROK X/TWITTER SENTIMENT (weight: 15%):
 X Mood: {grok_mood}
 Signal: {grok_signal}
 Key Insight: {grok_insight}"""
 
 content = content.replace(old_prompt_section, new_prompt_section)
-print("✅ Added Grok section to prompt")
+print(" Added Grok section to prompt")
 
 # Fix the format call to include grok vars
 old_format = """        msg = client.messages.create(
@@ -85,7 +85,7 @@ new_wt_line = '''        wt = " | ".join(f"{k}:{v*100:.0f}%" for k,v in weights.
         grok_insight = (grok or {}).get("key_insight", "No X data") if grok else "No X data"'''
 
 content = content.replace(old_wt_line, new_wt_line)
-print("✅ Added grok variables")
+print(" Added grok variables")
 
 # Fix the prompt format string
 old_prompt_format = '        prompt = f"""You are the master orchestrator'
@@ -94,4 +94,4 @@ old_prompt_format = '        prompt = f"""You are the master orchestrator'
 with open("orchestrator.py", "w") as f:
     f.write(content)
 
-print("\n✅ orchestrator.py patched successfully!")
+print("\n orchestrator.py patched successfully!")

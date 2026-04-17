@@ -1,5 +1,5 @@
 """
-MULTI-COIN BOT v2 — fetches macro ONCE per cycle, shares with all orchestrators
+MULTI-COIN BOT v2  fetches macro ONCE per cycle, shares with all orchestrators
 Fixes: CoinGecko rate limits, SOL/BNB NoneType errors
 """
 
@@ -45,9 +45,9 @@ def send_telegram(msg):
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
         r   = requests.post(url, data={"chat_id":TELEGRAM_CHAT_ID,"text":msg,"parse_mode":"HTML"}, timeout=10)
         if not r.json().get("ok"):
-            print(f"⚠️ Telegram: {r.text[:80]}")
+            print(f" Telegram: {r.text[:80]}")
     except Exception as e:
-        print(f"⚠️ Telegram error: {e}")
+        print(f" Telegram error: {e}")
 
 
 def check_exits(symbol, price):
@@ -57,9 +57,9 @@ def check_exits(symbol, price):
     hit = update_trade(trade_id, price)
     if hit:
         coin = symbol.replace("/USDT","")
-        log(f"🏁 {coin} trade #{trade_id} closed!")
+        log(f" {coin} trade #{trade_id} closed!")
         open_trades[symbol] = None
-        send_telegram(f"🏁 <b>{coin} Trade Closed!</b>\n\n{get_performance_report()}")
+        send_telegram(f" <b>{coin} Trade Closed!</b>\n\n{get_performance_report()}")
         memory.print_stats()
 
 
@@ -71,8 +71,8 @@ def execute_decision(symbol, result):
 
     check_exits(symbol, price)
 
-    ae = "🟢" if action=="BUY" else "🔴" if action=="SELL" else "🟡"
-    ce = "💪" if conf=="high" else "👍" if conf=="medium" else "🤔"
+    ae = "" if action=="BUY" else "" if action=="SELL" else ""
+    ce = "" if conf=="high" else "" if conf=="medium" else ""
 
     agents = result.get("agents", {})
     tech   = agents.get("technical") or {}
@@ -80,20 +80,20 @@ def execute_decision(symbol, result):
 
     fg_line = ""
     if macro.get("fear_greed"):
-        fg_line = f"\n😱 Fear & Greed: {macro['fear_greed']['value']}/100"
+        fg_line = f"\n Fear & Greed: {macro['fear_greed']['value']}/100"
 
     msg = (
-        f"🤖 <b>{coin} — Multi-Agent Analysis</b>\n"
-        f"🕐 {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
-        f"💰 <b>Price:</b> ${price:,.2f}\n"
-        f"📊 RSI 1h: {(tech.get('raw_data') or {}).get('rsi',0):.1f}"
+        f" <b>{coin}  Multi-Agent Analysis</b>\n"
+        f" {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+        f" <b>Price:</b> ${price:,.2f}\n"
+        f" RSI 1h: {(tech.get('raw_data') or {}).get('rsi',0):.1f}"
         f" | 4H: {(tech.get('raw_data') or {}).get('trend_4h','?')}\n"
-        f"🌍 Macro: {macro.get('regime','?')}{fg_line}\n"
-        f"📈 Consensus: {result['consensus_score']:+.3f}\n\n"
+        f" Macro: {macro.get('regime','?')}{fg_line}\n"
+        f" Consensus: {result['consensus_score']:+.3f}\n\n"
         f"{ae} <b>DECISION: {action}</b>\n"
         f"{ce} Confidence: {conf.upper()}\n\n"
-        f"🧠 {result['reasoning']}\n"
-        f"⚠️ {result['risks']}"
+        f" {result['reasoning']}\n"
+        f" {result['risks']}"
     )
 
     if result["approved"] and not open_trades[symbol] and action != "HOLD":
@@ -104,36 +104,36 @@ def execute_decision(symbol, result):
         memory.record_trade_entry(symbol, action, price,
                                   result["signals"], result["reasoning"], conf)
         msg += (
-            f"\n\n✅ <b>PAPER TRADE #{trade_id}</b>\n"
+            f"\n\n <b>PAPER TRADE #{trade_id}</b>\n"
             f"- Size: ${td['position_size_usd']}\n"
             f"- Entry: ${price:,.2f}\n"
             f"- Stop: ${td['stop_loss']:,.2f} | TP: ${td['take_profit']:,.2f}"
         )
-        log(f"📝 {coin} #{trade_id}: {action} @ ${price:,.2f}")
+        log(f" {coin} #{trade_id}: {action} @ ${price:,.2f}")
     elif open_trades[symbol]:
-        msg += f"\n\n⏳ Trade #{open_trades[symbol]} still open"
-        log(f"⏳ {coin}: holding #{open_trades[symbol]}")
+        msg += f"\n\n Trade #{open_trades[symbol]} still open"
+        log(f" {coin}: holding #{open_trades[symbol]}")
     else:
-        msg += f"\n\n⏸️ {result['risk_reason']}"
-        log(f"⏸️ {coin}: {action} ({conf}) — {result['risk_reason']}")
+        msg += f"\n\n {result['risk_reason']}"
+        log(f" {coin}: {action} ({conf})  {result['risk_reason']}")
 
     send_telegram(msg)
 
 
 def run_bot():
     log("="*55)
-    log("🚀 MULTI-AGENT BOT v2 STARTING")
-    log(f"📊 Coins: {', '.join(COINS)}")
-    log(f"💰 Capital: ${TOTAL_CAPITAL} (${TOTAL_CAPITAL/len(COINS):.0f}/coin)")
+    log(" MULTI-AGENT BOT v2 STARTING")
+    log(f" Coins: {', '.join(COINS)}")
+    log(f" Capital: ${TOTAL_CAPITAL} (${TOTAL_CAPITAL/len(COINS):.0f}/coin)")
     log("="*55)
 
     coins_str = ", ".join(c.replace("/USDT","") for c in COINS)
     send_telegram(
-        f"🚀 <b>Multi-Agent Bot v2 Started!</b>\n\n"
-        f"📊 Coins: {coins_str}\n"
-        f"🤖 Agents: Technical + Macro + On-Chain + Sentiment\n"
-        f"🧠 Macro fetched ONCE per cycle (no rate limits)\n"
-        f"💰 Capital: ${TOTAL_CAPITAL} total"
+        f" <b>Multi-Agent Bot v2 Started!</b>\n\n"
+        f" Coins: {coins_str}\n"
+        f" Agents: Technical + Macro + On-Chain + Sentiment\n"
+        f" Macro fetched ONCE per cycle (no rate limits)\n"
+        f" Capital: ${TOTAL_CAPITAL} total"
     )
 
     cycle = 0
@@ -141,57 +141,57 @@ def run_bot():
         try:
             cycle += 1
             log(f"\n{'='*55}")
-            log(f"🔄 Cycle #{cycle} — {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
+            log(f" Cycle #{cycle}  {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
             log(f"{'='*55}")
 
-            # ── Fetch macro ONCE for all coins ─────────────────────────────
-            log("🌍 Fetching macro data (shared across all coins)...")
+            #  Fetch macro ONCE for all coins 
+            log(" Fetching macro data (shared across all coins)...")
             try:
                 shared_macro = macro_agent.analyze()
-                log(f"✅ Macro: {shared_macro.get('regime','?')} | Score: {shared_macro.get('score',0):+d}")
+                log(f" Macro: {shared_macro.get('regime','?')} | Score: {shared_macro.get('score',0):+d}")
             except Exception as e:
-                log(f"⚠️ Macro failed: {e}")
+                log(f" Macro failed: {e}")
                 shared_macro = None
 
             # Set shared macro on all orchestrators
             for orch in ORCHESTRATORS.values():
                 orch.shared_macro = shared_macro
 
-            # ── Analyze each coin ─────────────────────────────────────────
+            #  Analyze each coin 
             for symbol in COINS:
                 coin = symbol.replace("/USDT","")
                 try:
-                    log(f"\n▶ Analyzing {coin}...")
+                    log(f"\n Analyzing {coin}...")
                     result = ORCHESTRATORS[symbol].analyze(symbol)
                     ORCHESTRATORS[symbol].print_decision(result)
                     execute_decision(symbol, result)
                     time.sleep(10)   # pause between coins
                 except Exception as e:
-                    log(f"⚠️ {coin} error: {e}")
-                    send_telegram(f"⚠️ <b>{coin} Error</b>\n{e}")
+                    log(f" {coin} error: {e}")
+                    send_telegram(f" <b>{coin} Error</b>\n{e}")
                     continue
 
-            # ── Daily report ──────────────────────────────────────────────
+            #  Daily report 
             if cycle % 24 == 0:
                 stats = memory.get_stats()
                 send_telegram(
-                    f"📊 <b>Daily Report — Cycle {cycle}</b>\n\n"
+                    f" <b>Daily Report  Cycle {cycle}</b>\n\n"
                     f"{get_performance_report()}\n\n"
-                    f"🧠 Patterns learned: {stats['patterns_discovered']}\n"
+                    f" Patterns learned: {stats['patterns_discovered']}\n"
                     f"Win rate: {stats['win_rate']}% | P&L: ${stats['total_pnl']:+,.2f}"
                 )
-                log("📊 Daily report sent")
+                log(" Daily report sent")
 
-            log(f"\n⏰ Next cycle in 1 hour...")
+            log(f"\n Next cycle in 1 hour...")
             time.sleep(3600)
 
         except KeyboardInterrupt:
-            log("🛑 Bot stopped by user")
-            send_telegram("🛑 <b>Bot stopped</b>")
+            log(" Bot stopped by user")
+            send_telegram(" <b>Bot stopped</b>")
             break
         except Exception as e:
-            log(f"⚠️ Main error: {e}")
-            send_telegram(f"⚠️ <b>Error</b>\n{e}\nRetrying in 60s...")
+            log(f" Main error: {e}")
+            send_telegram(f" <b>Error</b>\n{e}\nRetrying in 60s...")
             time.sleep(60)
 
 

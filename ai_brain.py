@@ -10,13 +10,13 @@ import os
 load_dotenv()
 api_key = os.getenv("ANTHROPIC_API_KEY")
 
-# ── FETCH MARKET DATA ───────────────────────────────────
+#  FETCH MARKET DATA 
 exchange = ccxt.binance()
-print("🔍 Fetching Bitcoin market data...")
+print(" Fetching Bitcoin market data...")
 candles = exchange.fetch_ohlcv("BTC/USDT", timeframe="1h", limit=100)
 df = pd.DataFrame(candles, columns=["timestamp", "open", "high", "low", "close", "volume"])
 
-# ── CALCULATE INDICATORS ────────────────────────────────
+#  CALCULATE INDICATORS 
 df["rsi"] = ta.rsi(df["close"], length=14)
 macd = ta.macd(df["close"])
 df["macd"] = macd.iloc[:, 0]
@@ -27,7 +27,7 @@ df["bb_lower"] = bb.iloc[:, 1]
 df["bb_mid"]   = bb.iloc[:, 2]
 df["volume_avg"] = df["volume"].rolling(20).mean()
 
-# ── GET LATEST VALUES ───────────────────────────────────
+#  GET LATEST VALUES 
 latest = df.iloc[-1]
 price    = latest["close"]
 rsi      = latest["rsi"]
@@ -39,7 +39,7 @@ bb_mid   = latest["bb_mid"]
 volume   = latest["volume"]
 vol_avg  = latest["volume_avg"]
 
-# ── BUILD MARKET SUMMARY FOR CLAUDE ─────────────────────
+#  BUILD MARKET SUMMARY FOR CLAUDE 
 market_summary = f"""
 Here is the current Bitcoin (BTC/USDT) market data as of {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}:
 
@@ -59,8 +59,8 @@ Based on this data, please analyze the market and give me:
 Be concise but thorough. Think like an experienced crypto trader.
 """
 
-# ── ASK CLAUDE AI ────────────────────────────────────────
-print("🧠 Asking Claude AI for analysis...\n")
+#  ASK CLAUDE AI 
+print(" Asking Claude AI for analysis...\n")
 client = anthropic.Anthropic(api_key=api_key)
 
 message = client.messages.create(
@@ -74,10 +74,10 @@ message = client.messages.create(
     ]
 )
 
-# ── PRINT CLAUDE'S RESPONSE ──────────────────────────────
+#  PRINT CLAUDE'S RESPONSE 
 print("="*55)
-print("  🤖 CLAUDE AI TRADING ANALYSIS")
+print("   CLAUDE AI TRADING ANALYSIS")
 print("="*55)
 print(message.content[0].text)
 print("="*55)
-print("\n✅ Analysis complete!\n")
+print("\n Analysis complete!\n")

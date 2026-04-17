@@ -1,10 +1,10 @@
 """
-AGENT 1 — Technical Agent
+AGENT 1  Technical Agent
 Reads multi-timeframe market data and scores it across
 RSI, MACD, Bollinger Bands, Volume, and EMA trend.
 
 Returns a structured dict the Orchestrator can consume.
-No LLM used here — deterministic and fast.
+No LLM used here  deterministic and fast.
 """
 
 import ccxt
@@ -17,31 +17,31 @@ exchange = ccxt.binance()
 class TechnicalAgent:
     def __init__(self):
         self.name = "technical"
-        print("📊 Technical Agent initialized")
+        print(" Technical Agent initialized")
 
     def get_market_data(self, symbol: str) -> dict:
         """Fetch 1h + 4h candles and compute all indicators."""
 
-        # ── 1H data ─────────────────────────────────────────
+        #  1H data 
         candles_1h = exchange.fetch_ohlcv(symbol, "1h", limit=100)
         df = pd.DataFrame(candles_1h, columns=["timestamp","open","high","low","close","volume"])
 
         df["rsi"]      = ta.rsi(df["close"], length=14)
         macd           = ta.macd(df["close"])
         df["macd"]     = macd.iloc[:, 0]   # MACD line
-        df["macd_sig"] = macd.iloc[:, 2]   # ✅ FIXED: signal line (was histogram)
+        df["macd_sig"] = macd.iloc[:, 2]   #  FIXED: signal line (was histogram)
         bb             = ta.bbands(df["close"], length=20)
-        df["bb_lower"] = bb.iloc[:, 0]     # ✅ FIXED: BBL
-        df["bb_mid"]   = bb.iloc[:, 1]     # ✅ FIXED: BBM
-        df["bb_upper"] = bb.iloc[:, 2]     # ✅ FIXED: BBU
+        df["bb_lower"] = bb.iloc[:, 0]     #  FIXED: BBL
+        df["bb_mid"]   = bb.iloc[:, 1]     #  FIXED: BBM
+        df["bb_upper"] = bb.iloc[:, 2]     #  FIXED: BBU
         df["vol_avg"]  = df["volume"].rolling(20).mean()
 
-        # ── 4H data ─────────────────────────────────────────
+        #  4H data 
         candles_4h = exchange.fetch_ohlcv(symbol, "4h", limit=250)
         df4 = pd.DataFrame(candles_4h, columns=["timestamp","open","high","low","close","volume"])
         df4["rsi"]    = ta.rsi(df4["close"], length=14)
         df4["ema50"]  = ta.ema(df4["close"], length=50)
-        df4["ema200"] = ta.ema(df4["close"], length=200)  # ✅ FIXED: was length=50
+        df4["ema200"] = ta.ema(df4["close"], length=200)  #  FIXED: was length=50
 
         r  = df.iloc[-1]
         r4 = df4.iloc[-1]
@@ -64,7 +64,7 @@ class TechnicalAgent:
         }
 
     def analyze(self, symbol: str) -> dict:
-        print(f"📊 Technical Agent analyzing {symbol}...")
+        print(f" Technical Agent analyzing {symbol}...")
         data = self.get_market_data(symbol)
 
         price     = data["price"]
@@ -81,57 +81,57 @@ class TechnicalAgent:
         score   = 0
         reasons = []
 
-        # ── RSI ──────────────────────────────────────────────
+        #  RSI 
         if rsi < 30:
             score += 3
-            reasons.append(f"RSI {rsi:.1f} — deeply oversold 🥶")
+            reasons.append(f"RSI {rsi:.1f}  deeply oversold ")
         elif rsi < 40:
             score += 1
-            reasons.append(f"RSI {rsi:.1f} — leaning oversold")
+            reasons.append(f"RSI {rsi:.1f}  leaning oversold")
         elif rsi > 70:
             score -= 3
-            reasons.append(f"RSI {rsi:.1f} — deeply overbought 🔥")
+            reasons.append(f"RSI {rsi:.1f}  deeply overbought ")
         elif rsi > 60:
             score -= 1
-            reasons.append(f"RSI {rsi:.1f} — leaning overbought")
+            reasons.append(f"RSI {rsi:.1f}  leaning overbought")
         else:
-            reasons.append(f"RSI {rsi:.1f} — neutral")
+            reasons.append(f"RSI {rsi:.1f}  neutral")
 
-        # ── MACD ─────────────────────────────────────────────
+        #  MACD 
         if macd > macd_sig:
             score += 2
-            reasons.append("MACD bullish crossover 📈")
+            reasons.append("MACD bullish crossover ")
         else:
             score -= 2
-            reasons.append("MACD bearish crossover 📉")
+            reasons.append("MACD bearish crossover ")
 
-        # ── Bollinger Bands ──────────────────────────────────
+        #  Bollinger Bands 
         if price < bb_lower:
             score += 2
-            reasons.append("Price below lower BB — oversold stretch")
+            reasons.append("Price below lower BB  oversold stretch")
         elif price > bb_upper:
             score -= 2
-            reasons.append("Price above upper BB — overbought stretch")
+            reasons.append("Price above upper BB  overbought stretch")
         else:
-            reasons.append("Price inside BB — normal range")
+            reasons.append("Price inside BB  normal range")
 
-        # ── Volume confirmation ──────────────────────────────
+        #  Volume confirmation 
         if vol_ratio > 1.5:
             score = int(score * 1.4)
-            reasons.append(f"Volume {vol_ratio:.1f}x avg — strong conviction 🔊")
+            reasons.append(f"Volume {vol_ratio:.1f}x avg  strong conviction ")
         elif vol_ratio < 0.6:
             score = int(score * 0.6)
-            reasons.append(f"Volume {vol_ratio:.1f}x avg — weak/unreliable 🔇")
+            reasons.append(f"Volume {vol_ratio:.1f}x avg  weak/unreliable ")
 
-        # ── 4H trend filter ───────────────────────────────────
+        #  4H trend filter 
         if trend_4h == "BULLISH":
             score += 2
-            reasons.append("4H trend BULLISH (EMA50 > EMA200) ✅")
+            reasons.append("4H trend BULLISH (EMA50 > EMA200) ")
         else:
             score -= 2
-            reasons.append("4H trend BEARISH (EMA50 < EMA200) ⚠️")
+            reasons.append("4H trend BEARISH (EMA50 < EMA200) ")
 
-        # ── Convert score → signal ───────────────────────────
+        #  Convert score  signal 
         if score >= 3:
             signal, confidence = "BUY", "high"
         elif score >= 1:
@@ -155,7 +155,7 @@ class TechnicalAgent:
             "size_pct"  : 0.02,
         }
 
-        print(f"  → {signal} ({confidence}) | score: {score:+d}")
+        print(f"   {signal} ({confidence}) | score: {score:+d}")
         return result
 
 
