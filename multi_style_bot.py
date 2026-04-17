@@ -219,10 +219,10 @@ def execute(style, symbol, agent_result, final, macro):
     coin   = symbol.replace("/USDT", "")
     action = final["action"]
     conf   = final["confidence"]
-    price  = (agent_result.get("raw_data") or {}).get("price", 0)
+            price = result.get("raw_data", {}).get("price", 0) or float(exchange.fetch_ticker(symbol)["last"])
 
     if price == 0:
-        log(f"   [{style}] {coin}: price is 0, skipping")
+            # price validated above
         return
 
     check_exits(style, symbol, price)
