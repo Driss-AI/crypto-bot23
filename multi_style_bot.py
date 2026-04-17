@@ -219,7 +219,7 @@ def execute(style, symbol, agent_result, final, macro):
     coin   = symbol.replace("/USDT", "")
     action = final["action"]
     conf   = final["confidence"]
-            price = agent_result.get("raw_data", {}).get("price", 0) or float(exchange.fetch_ticker(symbol)["last"])
+    price = agent_result.get("raw_data", {}).get("price", 0) or float(exchange.fetch_ticker(symbol)["last"])
 
 
     check_exits(style, symbol, price)
