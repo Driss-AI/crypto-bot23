@@ -169,7 +169,7 @@ ECONOMIC CALENDAR:
 
 {whale_text}
 
-Make the FINAL {style_name} decision. Respond EXACTLY:
+Make the FINAL {style_name} decision. If technical score >= 3 you MUST say BUY. If score <= -3 you MUST say SELL. Only HOLD if score is between -2 and 2. Respond EXACTLY:
 ACTION: [BUY or SELL or HOLD]
 CONFIDENCE: [high or medium or low]
 REASONING: [1-2 sentences specific to {style_name} style]
@@ -219,11 +219,8 @@ def execute(style, symbol, agent_result, final, macro):
     coin   = symbol.replace("/USDT", "")
     action = final["action"]
     conf   = final["confidence"]
-            price = result.get("raw_data", {}).get("price", 0) or float(exchange.fetch_ticker(symbol)["last"])
+            price = agent_result.get("raw_data", {}).get("price", 0) or float(exchange.fetch_ticker(symbol)["last"])
 
-    if price == 0:
-            # price validated above
-        return
 
     check_exits(style, symbol, price)
 
