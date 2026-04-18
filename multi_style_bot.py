@@ -299,14 +299,14 @@ def run_style(style, agent_fn, news, whale_data=None):
             result = agent_fn(symbol)
             final  = ask_claude(symbol, style, result, shared_macro, news, whale_data)
 
-        # GROK CROSS-CHECK
-        if final["action"] in ("BUY", "SELL") and style in ("scalp", "day"):
+            # GROK CROSS-CHECK
+            if final["action"] in ("BUY", "SELL") and style in ("scalp", "day"):
             price_now = result.get("raw_data", {}).get("price", 0)
             grok = ask_grok(symbol, price_now, final["action"], result.get("score", 0))
             log(f"  Grok: {grok['vote']} ({grok['confidence']}) - {grok['reasoning'][:60]}")
             if grok["vote"] != final["action"]:
-                log(f"  VETOED by Grok")
-                final["action"] = "HOLD"
+            log(f"  VETOED by Grok")
+            final["action"] = "HOLD"
             execute(style, symbol, result, final, shared_macro)
             time.sleep(3)
         except Exception as e:
