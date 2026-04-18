@@ -301,11 +301,11 @@ def run_style(style, agent_fn, news, whale_data=None):
 
             # GROK CROSS-CHECK
             if final["action"] in ("BUY", "SELL") and style in ("scalp", "day"):
-            price_now = result.get("raw_data", {}).get("price", 0)
-            grok = ask_grok(symbol, price_now, final["action"], result.get("score", 0))
-            log(f"  Grok: {grok['vote']} ({grok['confidence']}) - {grok['reasoning'][:60]}")
-            if grok["vote"] != final["action"]:
-                log(f"  VETOED by Grok")
+                price_now = result.get("raw_data", {}).get("price", 0)
+                grok = ask_grok(symbol, price_now, final["action"], result.get("score", 0))
+                log(f"  Grok: {grok['vote']} ({grok['confidence']}) - {grok['reasoning'][:60]}")
+                if grok["vote"] != final["action"]:
+                    log(f"  VETOED by Grok")
                     final["action"] = "HOLD"
             execute(style, symbol, result, final, shared_macro)
             time.sleep(3)
