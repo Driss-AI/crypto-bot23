@@ -306,7 +306,7 @@ def run_style(style, agent_fn, news, whale_data=None):
             log(f"  Grok: {grok['vote']} ({grok['confidence']}) - {grok['reasoning'][:60]}")
             if grok["vote"] != final["action"]:
                 log(f"  VETOED by Grok")
-            final["action"] = "HOLD"
+                    final["action"] = "HOLD"
             execute(style, symbol, result, final, shared_macro)
             time.sleep(3)
         except Exception as e:
