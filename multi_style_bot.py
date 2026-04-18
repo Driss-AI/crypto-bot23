@@ -23,6 +23,7 @@ from swing_agent     import SwingAgent
 from macro_agent     import MacroAgent
 from news_scraper    import get_full_sentiment, format_for_ai
 from economic_calendar import is_news_blackout, get_macro_context
+from grok_agent import ask_grok
 from whale_detector  import analyze_whales, format_whale_summary
 from risk_manager    import RiskManager
 from performance     import record_trade, update_trade, get_performance_report
@@ -297,6 +298,15 @@ def run_style(style, agent_fn, news, whale_data=None):
         try:
             result = agent_fn(symbol)
             final  = ask_claude(symbol, style, result, shared_macro, news, whale_data)
+
+        # GROK CROSS-CHECK
+        if final["action"] in ("BUY", "SELL") and style in ("scalp", "day"):
+            price_now = result.get("raw_data", {}).get("price", 0)
+            grok = ask_grok(symbol, price_now, final["action"], result.get("score", 0))
+            log(f"  Grok: {grok['vote']} ({grok['confidence']}) - {grok['reasoning'][:60]}")
+            if grok["vote"] != final["action"]:
+                log(f"  VETOED by Grok")
+                final["action"] = "HOLD"
             execute(style, symbol, result, final, shared_macro)
             time.sleep(3)
         except Exception as e:
