@@ -274,7 +274,8 @@ def execute(style, symbol, agent_result, final, macro):
         msg += f"\n {reason}"
         log(f" [{style.upper()}] {coin}: {action}  {reason}")
 
-    send_telegram(msg)
+    if action in ("BUY", "SELL"):
+        send_telegram(msg)
 
 
 #  STYLE RUNNERS 
