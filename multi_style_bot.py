@@ -88,14 +88,33 @@ def send_telegram(msg):
         print(f"⚠️ Telegram error: {e}")
 
 def sync_open_trades_from_db():
+    """On startup, reload open trades from DB into memory so the bot
+    doesn't lose track of positions after a Railway restart."""
     try:
         import psycopg2
         conn = psycopg2.connect(os.getenv("DATABASE_URL"), sslmode="require")
         cur  = conn.cursor()
-        cur.execute("SELECT id, action FROM paper_trades WHERE status='OPEN'")
+        cur.execute("""
+            SELECT id, symbol, style
+            FROM paper_trades
+            WHERE status='OPEN'
+            ORDER BY id
+        """)
         rows = cur.fetchall()
         conn.close()
-        log(f"📂 Found {len(rows)} open trades in DB on startup")
+
+        restored = 0
+        for trade_id, symbol, style in rows:
+            if symbol and style and symbol in COINS and style in STYLES:
+                # Only restore if we don't already have one for this slot
+                if open_trades[style].get(symbol) is None:
+                    open_trades[style][symbol] = trade_id
+                    restored += 1
+                    log(f"  🔄 Restored: #{trade_id} [{style.upper()}] {symbol}")
+            else:
+                log(f"  ⚠️ Skipped orphan trade #{trade_id} [{style} {symbol}]")
+
+        log(f"📂 Synced {restored}/{len(rows)} open trades from DB")
     except Exception as e:
         log(f"⚠️ DB sync on startup failed: {e}")
 
@@ -138,6 +157,34 @@ def check_exits(style, symbol, price):
     if hit:
         coin = symbol.replace("/USDT", "")
         log(f"✅ [{style.upper()}] {coin} trade #{trade_id} closed!")
+
+        # Feed outcome back to scoring engine for adaptive weight learning
+        try:
+            import psycopg2
+            conn = psycopg2.connect(os.getenv("DATABASE_URL"), sslmode="require")
+            cur  = conn.cursor()
+            cur.execute("""
+                SELECT pnl, score,
+                       (SELECT action FROM paper_trades WHERE id=%s) as action
+                FROM paper_trades WHERE id=%s
+            """, (trade_id, trade_id))
+            row = cur.fetchone()
+            conn.close()
+            if row and row[0] is not None:
+                actual_pnl = float(row[0])
+                # Reconstruct breakdown from stored score (approximate)
+                stored_score = float(row[1] or 0)
+                approx_breakdown = {
+                    "technical" : stored_score * 0.45,
+                    "macro"     : stored_score * 0.20,
+                    "sentiment" : stored_score * 0.20,
+                    "whale"     : stored_score * 0.15,
+                }
+                scoring_eng.record_closed_trade(approx_breakdown, "RANGING", actual_pnl)
+                log(f"  🧠 Feedback recorded: PnL=${actual_pnl:+.2f}")
+        except Exception as e:
+            log(f"  ⚠️ Feedback error: {e}")
+
         memory.record_trade_exit(symbol, trade_id, price)
         open_trades[style][symbol] = None
         send_telegram(f"✅ {'📈' if style=='day' else '🌊'} {style.upper()} {coin} Closed!\n\n{get_performance_report()}")
@@ -172,7 +219,9 @@ def execute(style, symbol, agent_result, score_result, explanation):
         tp     = price * (1 + tp_pct) if action == "BUY" else price * (1 - tp_pct)
         size   = details["position_size_usd"]
 
-        trade_id = record_trade(action, price, sl, tp, size, conf)
+        trade_id = record_trade(action, price, sl, tp, size, conf,
+                               symbol=symbol, style=style,
+                               score=score_result.get("score", 0.0))
         open_trades[style][symbol] = trade_id
 
         memory.record_trade_entry(
