@@ -242,6 +242,7 @@ def run_style(style, agent_fn, news, whale_data=None):
             score_result = scoring_eng.score(
                 technical=agent_result,
                 regime=regime,
+                style=style,
                 macro=shared_macro,
                 grok=grok,
                 whale=(whale_data or {}).get(symbol),
@@ -327,12 +328,11 @@ def run_bot():
 
             # Daily report
             if cycle % int(86400 / TICK_SECONDS) == 0 and cycle > 0:
-                acc   = scoring_eng.get_signal_accuracy()
-                stats = memory.get_stats()
-                acc_str = " | ".join(f"{k}: {v:.0f}%" if v else f"{k}: N/A" for k, v in acc.items())
+                stats   = memory.get_stats()
+                acc_str = scoring_eng.format_stats_for_telegram()
                 send_telegram(
                     f"📊 Daily Report\n\n{get_performance_report()}\n\n"
-                    f"📡 Signal accuracy:\n{acc_str}\n\n"
+                    f"{acc_str}\n\n"
                     f"Win rate: {stats.get('win_rate',0)}% | P&L: ${stats.get('total_pnl',0):+,.2f}"
                 )
 
